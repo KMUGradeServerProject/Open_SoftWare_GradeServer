@@ -1,0 +1,375 @@
+		/*
+		fill every "here" sign using jinja2 template
+
+		when you click 'Title', link to its information
+		*/
+
+body {
+	min-width: 300px;
+	min-height: 400px;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration:none;
+}
+.nav>ul {
+	position: relative;
+	top: 50%;
+	trasform: translateY(-50%);
+}
+
+.fluid-footer {
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	text-align: center;
+	padding: 10px;
+}
+
+ul.flashes {
+	list-style: none;
+	margin: 10px 10px 0 10px;
+	padding: 0;
+}
+
+ul.flashes li {
+	background: #B9F3ED;
+	border: 1px solid #81CEC6;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	padding: 4px;
+	font-size: 13px;
+}
+
+.comment, .page_num {
+	width: 100%;
+	text-align: center;
+}
+
+.result_examples {
+	text-align: center;
+}
+
+.label>h3 {
+	font-size: 20px;
+}
+
+.result.container {
+	width: 50%;
+}
+
+@media (min-width:767px){
+	#time-limit, #memory-limit {
+		width: 45%;
+	}
+	#time-limit {
+		text-align:right;
+	}
+	#memory-limit {
+		text-align:left;
+	}
+}
+
+
+#user-code-info {
+	height:100%;
+}
+
+.body>.container {
+	margin-top:15px;
+}
+
+@media (min-width:965px){
+	ul.nav {
+		padding-top: 10px;
+	}
+}
+
+#id, #pw {
+	width:135px;
+}
+
+.content {
+	overflow-y: hidden;
+}
+
+@media(min-width:768px){
+	.content{
+		margin-left:42px;
+	}
+	#writePlace {
+		width:530px;
+	}
+	#writeDone {
+		margin-left:42px;
+	}
+}
+
+td.span {
+	vertical-align: middle;
+}
+
+.pagination ul > li > a {
+	color: #444444;
+}
+
+/* CUSTOMIZE THE CAROUSEL
+-------------------------------------------------- */
+
+
+
+/* CUSTOMIZE THE CAROUSEL
+-------------------------------------------------- */
+
+/* Carousel base class */
+.carousel-control {
+  height: 80px;
+  margin-top: 0;
+  font-size: 120px;
+  color: #000000;
+  text-shadow: 0 1px 1px rgba(0,0,0,.4);
+  background-color: transparent;
+  border:0px;
+}
+.carousel.container {
+	position: relative;
+}
+.carousel {
+	margin-right: 20px;
+  height: 300px;
+}
+/* Since positioning the image, we need to help out the caption */
+.carousel-caption {
+	background-color: transparent;
+  position: static;
+  max-width: 550px;
+  z-index: 10;
+}
+
+/* Declare heights because of positioning of img element */
+.carousel .item {
+  height: 300px;
+  background-color: #ffffff;
+  margin: 0px;
+}
+
+.carousel-caption h1,
+.carousel-caption .lead {
+  margin: 0;
+  line-height: 1.25;
+  /*color: #fff;*/
+  text-shadow: 0 1px 1px rgba(0,0,0,.4);
+}
+.carousel-caption .btn {
+  margin-top: 10px;
+}
+
+.carousel-inner > .item > img {
+	position:absolute;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  height: 300px;
+}
+
+.carousel-indicators {
+	position:absolute;
+	margin-top:260px;
+}
+
+.carousel-caption p {
+	color: black;
+}
+.disable {
+	background-color: gray;
+}
+
+thead{
+	font-weight:bold;
+}
+
+/* search bar -- problems */
+#search-problems {
+	display: block; 
+}
+ 
+#search-problems form {
+  display: inline-block;
+  background: #eeefed;
+  padding: 0;
+  margin: 0;
+  padding: 5px;
+  border-radius: 3px;
+  margin: 5px 0 0 0;
+}
+#search-problems form .biginput {
+  width: 600px;
+  height: 40px;
+  padding: 0 10px 0 10px;
+  background-color: #fff;
+  border: 1px solid #c8c8c8;
+  border-radius: 3px;
+  color: #aeaeae;
+  font-weight:normal;
+  font-size: 1.5em;
+  -webkit-transition: all 0.2s linear;
+  -moz-transition: all 0.2s linear;
+  transition: all 0.2s linear;
+}
+#search-problems form .biginput:focus {
+  color: #858585;
+}
+
+/*****************************/
+
+/* autocomplete search */
+.autocomplete-suggestions {
+	border: 1px solid #999; 
+	background: #fff; 
+	cursor: default; 
+	overflow: auto; 
+}
+.autocomplete-suggestion {
+	padding: 10px 5px;
+	white-space: nowrap;
+	overflow: hidden; 
+}
+.autocomplete-selected {
+	background: #f0f0f0; 
+}
+.autocomplete-suggestions strong {
+	font-weight: normal; 
+	color: #3399ff; 
+}
+/******************************/
+
+.input-ularge {
+	width: 190px;
+}
+
+.input-usmall {
+	width: 80px;
+}
+
+#myTab {
+	margin-bottom:0px;
+}
+
+#addProblemModal{
+	width:1000px;
+	margin-left:-500px
+}
+
+#addUserModal{
+	width:700px;
+	margin-left:-350px
+}
+
+.autocomplete-suggestions{
+	width:auto; 
+}
+
+.label-searchLine, .badge-searchLine {
+	background-color: #FFFFA2;
+}
+
+
+.solved {
+	background-color: #D9EDF7 ;
+}
+.never_submitted {
+	background-color: #FAF8F0 ;
+}
+.judging {
+	background-color: #FFFF8F ;
+}
+.server_error {
+	background-color: #EFEFEF ;
+}
+.etc_error {
+	background-color: #FFB0B0 ;
+}
+
+.navbar{
+	font-weight: bold;
+	font-size: 18px;
+}
+
+.carousel-inner .active.left {
+	left: -33%; 
+}
+
+.carousel-inner .next        {
+	left:  33%; 
+}
+
+.carousel-inner .prev        {
+	left: -33%; 
+}
+
+.datePicker, .dateTimePicker {
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border: 1px solid #cccccc;
+}
+
+.modal-dialog {
+	text-align: left;
+}
+
+.modal.info {
+	width: 60%;
+	margin-left: -30%;
+}
+
+.modal-scroll {
+	height: 500px;
+	max-height: 800px;
+}
+
+.modal-header .close {
+  margin-top: 2px;
+  right: 2px;
+}
+
+.scrollable-menu {
+    height: auto;
+    overflow-x: hidden;
+}
+
+.tab-left, .tab-right{
+	padding-top: 10px;
+	position: absolute;
+	z-index: 1;
+	font-size: 100px;	
+	display: none;
+	/* prevent from selection */
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+}
+
+.tab-left:hover, .tab-right:hover{
+	text-decoration: none;
+}
+
+@media (min-width: 1200px){
+	#pw{
+        margin-bottom: 7px;
+      }
+      #submit{
+      	margin-top: 0px;
+      }
+}
+@media (max-width: 1199px){
+	#submit, #pw{
+        margin-bottom: 0px;
+        margin-top: 0px;
+      }
+}

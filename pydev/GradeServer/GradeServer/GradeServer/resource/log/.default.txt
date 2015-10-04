@@ -1,0 +1,4 @@
+Github does not allow to upload empty folder.
+Our '.gitignore' has '*.log' because we do not pursue to store our log into Github.
+That is the reason why 'log' folder is not uploaded on Github.
+So it should not be empty folder and this file is to prevent it not to be empty.

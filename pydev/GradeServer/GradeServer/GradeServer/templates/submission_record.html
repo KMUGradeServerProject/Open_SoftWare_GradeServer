@@ -1,0 +1,250 @@
+<!-- //////////////////////////////////////////
+		fill every "here" sign using jinja2 template
+		/////////////////////////////////////////// -->
+
+{%- extends "main.html" -%}
+{%- block body %}
+
+<script>
+// set donut chart graph
+$.getScript('../../static/bootstrap/js/Chart.js',function(){
+	var data = [];
+	var options = {
+		animation: false
+	};
+
+  //Get the context of the canvas element we want to select
+  var c = $('#submitChart');
+  var ct = c.get(0).getContext('2d');
+  var ctx = document.getElementById("submitChart").getContext("2d");
+  // Purple, Black, Dark Blue, Cyan, Pink
+  var colors = new Array("#3a87ad", "#b94a48", "#18709c", "#19bdc4", "#fff6ee", "#DD00CC");
+  var highlightColors =new Array('#ff0000', '#ffbb00', '#ffe400', '#1DDB16', '#5F00FF', "#FFFFF") ;
+  /*************************************************************************/
+
+  myNewChart = new Chart(ct).Doughnut(data, options);
+  // input values and colors into the chart
+  // need to change 'value:#' 
+  {%- for i in range(0, 6) %}
+  	{%- if chartSubmissionRecords[i + 2] %}
+  	myNewChart.addData ({
+  		value: {{ chartSubmissionRecords[i + 2] }},
+  		color: colors[{{ i }}],
+  		label: '{{ chartSubmissionDescriptions[i + 2][session['language']] }}',
+  		highlight: highlightColors[{{ i }}]
+  		})
+		{% endif -%}
+  {% endfor -%}
+})
+</script>
+
+<div class="container">
+	<h3 style = "text-align:center">
+	{{ LanguageResources().const.UserRecord[session['language']] }}
+		<br>
+	 {{ member.memberId }} {{ member.memberName }}
+	</h3>
+	<div class="row-fluid" style="padding-top:20px">
+		<div class="span3">
+			<!-- Chart -->
+			<div class="row-fluid" style="text-align:center">
+				<div class="spanX">
+					<canvas id="submitChart" style="width:auto"></canvas>
+				</div>
+				
+				<div class="spanY">
+					<style> h4{ padding-bottom: 5px; } </style>
+					<h5>
+						<table style="width:100%">
+						<!--  chartSubmissionRecords is Value, chartSubmissionDescriptions is Description -->
+						{%- for chartSubmissionDescription in chartSubmissionDescriptions %}
+						<tr>
+							<td class="key" style="width:69%">{{ chartSubmissionDescription[session['language']] }}
+							<td class="value" style="width:31%">{%- if chartSubmissionRecords[loop.index0] %}{{ chartSubmissionRecords[loop.index0] }}{%- else %}0{% endif -%}
+						</tr>
+						{% endfor -%}
+						</table>
+					</h5>
+				</div>
+			</div>
+		</div>
+		<!-- end Chart -->
+		<!--  startList -->
+		<div class="span9" style="text-align:center">
+			<table class="problem_list table table-bordered">
+				<thead>
+					<tr>
+						<td class = "span3">
+							{{ LanguageResources.const.Problems[session['language']] }}
+						<td class="hidden-phone hidden-tablet" style = "width: 140px">
+							{{ LanguageResources.const.Status[session['language']] }}
+						<td style = "width: 50px">
+							{{ LanguageResources.const.Score[session['language']] }}
+						<td class="hidden-phone">
+							<span class="hidden-tablet hidden-phone">
+								{{ LanguageResources.const.Language[session['language']] }}
+							</span>
+							<span class="hidden-desktop">Lang</span>
+						<td class="hidden-phone">
+							<a href="{{ url_for('GradeServer.submission_record',
+																	memberIdIndex = memberIdIndex,
+																	sortCondition = LanguageResources().const.Runtime[1],
+																	pageNum = pages['pageNum']) }}">
+							{{ LanguageResources.const.Runtime[session['language']] }} (ms)
+							</a>
+						<td class="hidden-phone">
+							<a href="{{ url_for('GradeServer.submission_record',
+																	memberIdIndex = memberIdIndex,
+																	sortCondition = LanguageResources().const.Memory[1],
+																	pageNum = pages['pageNum']) }}">
+							{{ LanguageResources.const.Memory[session['language']] }}(KB)
+							</a>
+						<td class="hidden-phone">
+							<a href="{{ url_for('GradeServer.submission_record',
+																	memberIdIndex = memberIdIndex,
+																	sortCondition = LanguageResources().const.FileSize[1],
+																	pageNum = pages['pageNum']) }}">
+								<span class="hidden-tablet hidden-phone">
+									{{ LanguageResources.const.FileSize[session['language']] }} (Byte)
+								</span>
+								<span class="hidden-desktop">Len</span>
+							</a>
+						<td>
+							<a href="{{ url_for('GradeServer.submission_record',
+																	memberIdIndex = memberIdIndex,
+																	sortCondition = LanguageResources().const.SubmissionDate[1],
+																	pageNum = pages['pageNum']) }}">
+								{{ LanguageResources.const.SubmissionDate[session['language']] }}
+							</a>
+					</tr>
+				<tbody>
+					{%- for submissionRecord in submissionRecords %}
+					<tr class='alert {%- if submissionRecord.status == "SOLVED" %} solved
+						      {% elif submissionRecord.status == None %} never_submitted
+						      {% elif submissionRecord.status == "SERVER_ERROR" %} server_error
+				      		{% elif submissionRecord.status == "JUDGING" %} judging
+				      		{% else %} etc_error
+						      {% endif -%}'>
+						<td>
+							{%- if submissionRecord.problemName %}
+							<script> 
+								// if title is longer than 15 charater, change it to short
+								var problemName = "{{ submissionRecord.problemName }}"; 
+								if(problemName.length >= 15){
+									problemName = problemName.substring(0, 13) + "...";
+								}
+								document.write(problemName);
+							</script>
+							{% endif -%}
+						<td  class="hidden-phone hidden-tablet">
+							{%- if submissionRecord.status %}
+								{% if submissionRecord.status == ENUMResources().const.NEVER_SUBMITTED %}
+								{{ LanguageResources().const.NeverSubmitted[session['language']] }}
+								{% elif submissionRecord.status == ENUMResources().const.SOLVED %}
+								{{ LanguageResources().const.Solved[session['language']] }}
+								{% elif submissionRecord.status == ENUMResources().const.WRONG_ANSWER %}
+								{{ LanguageResources().const.WrongAnswer[session['language']] }}
+								{% elif submissionRecord.status == ENUMResources().const.COMPILE_ERROR %}
+								{{ LanguageResources().const.CompileError[session['language']] }}
+								{% elif submissionRecord.status == ENUMResources().const.TIME_OVER %}
+								{{ LanguageResources().const.TimeOver[session['language']] }}
+								{% elif submissionRecord.status == ENUMResources().const.MEMORY_OVERFLOW %}
+								{{ LanguageResources().const.MemoryOverflow[session['language']] }}
+								{% elif submissionRecord.status == ENUMResources().const.JUDGING %}
+								{{ LanguageResources().const.Judging[session['language']] }}
+								{% elif submissionRecord.status == ENUMResources().const.RUNTIME_ERROR %}
+								{{ LanguageResources().const.RuntimeError[session['language']] }}
+								{% elif submissionRecord.status == ENUMResources().const.SERVER_ERROR %}
+								{{ LanguageResources().const.ServerError[session['language']] }}
+								{% endif %}
+							{% endif -%}
+						<td>
+							{%- if submissionRecord.score %}
+							{{ submissionRecord.score }}
+							{%- else %}
+							0
+							{% endif -%}
+						<td class="hidden-phone">
+							{%- if submissionRecord.languageName %}
+							{{ submissionRecord.languageName }}
+							{% endif -%}
+						<td class="hidden-phone">
+							{%- if submissionRecord.runTime %}
+							{{ submissionRecord.runTime }}
+							{%- else %}
+							0
+							{% endif -%}
+						<td class="hidden-phone">
+							{%- if submissionRecord.usedMemory %}
+							{{ submissionRecord.usedMemory }}
+							{%- else %}
+							0
+							{% endif -%}
+						<td class="hidden-phone">
+							{%- if submissionRecord.sumOfSubmittedFileSize %}
+							{{ submissionRecord.sumOfSubmittedFileSize }}
+							{% endif -%}
+						<td>
+							{%- if submissionRecord.codeSubmissionDate %}
+							{{ get_datetime_delete_sceond(submissionRecord.codeSubmissionDate) }}
+							{% endif -%}
+					</tr>
+					{% endfor -%}
+			</table>
+		
+			<!-- end List -->
+			<!-- page number section -->
+			<div class="pagination pagination-centered">
+				<ul>
+					{%- if pages['startPage'] > 1 %}
+					<li><a href="{{ url_for ('GradeServer.submission_record',memberIdIndex = memberIdIndex, sortCondition = sortCondition, pageNum = pages['pageNum'] - 1) }}"><</a></li>
+					{% endif -%} 
+					
+					{%- for i in range (pages['startPage'], pages['endPage'] + 1) %}
+					<li>
+						{%- if pages['pageNum'] == i %}
+						<a style ='background-color:gray'>
+						{%- else %}
+						<a href="{{ url_for ('GradeServer.submission_record', memberIdIndex = memberIdIndex, sortCondition = sortCondition, pageNum = i) }}">
+						{% endif -%}
+						{{ i }}
+						</a>
+					</li>
+					{% endfor -%}
+					
+					{%- if pages['endPage'] < pages ['allPage'] %}
+					<li><a href="{{ url_for ('GradeServer.submission_record', memberIdIndex = memberIdIndex, sortCondition = sortCondition, pageNum = pages['pageNum'] + 1) }}">></a></li>
+					{% endif -%}
+				</ul>
+			</div>
+			<!-- end page number section -->
+		</div>
+	</div>
+</div>
+<script>
+$(function(){
+	if(window.innerWidth < 768){
+		$("#submitChart").css("margin-left", 0);
+	}
+	else{
+		placeChartCenter("submitChart");
+	}
+	$(window).resize(function(){
+		if(window.innerWidth < 768){
+			$("#submitChart").css("margin-left", 0);
+			$(".key").css("width", "50%");
+			$(".value").css("width", "50%");
+		}
+		else{
+			placeChartCenter("submitChart");
+			$(".key").css("width", "69%");
+			$(".value").css("width", "31%");
+		}
+	})
+});
+function placeChartCenter(id){
+	$("#"+id).css("margin-left", ($("#"+id).parent().width()-$("#"+id).width())/2+"px");
+}
+</script>
+{% endblock -%}
+

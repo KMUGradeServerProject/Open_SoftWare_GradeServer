@@ -1,0 +1,339 @@
+<!-- 
+	@@ manage_problem.html
+
+	The page when server administrator manages problems.
+	author: seulgi choi & uijae lee
+-->
+		
+{%- extends "main.html" -%}
+{%- block body %}
+<div class="container">
+	<h3>
+		{{ LanguageResources().const.Problem[session['language']] }}
+		{{ LanguageResources().const.Management[session['language']] }}
+	</h3>
+	<!--
+		@@ Hidden modal pop
+
+		1. Problem addition
+		2. Problem deletion
+		3. No items choosed
+	-->
+	<!-- Problem addition -->
+	<div class="modal hide fade" id="addModal" aria-hidden="true"
+		  aria-labelledby="addModalLabel" role="dialog" tabindex="-1">
+		<form method="post" enctype="multipart/form-data">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal" type="button"
+						  aria-hidden="true">
+				  	x
+			  	</button>
+				<h3 id="addModalLabel">
+					{{ LanguageResources.const.Problem[session['language']] }}
+					{{ LanguageResources.const.Addition[session['language']] }}
+				</h3>
+			</div>
+			<!--
+				It allows multiple files to upload.
+				Before you push 'Upload', make sure the files' contents are suit to the manual.
+			-->
+			<div class="modal-body">
+				<p>Manual : "Manual"</p>
+				Problem(*.zip):	<input type="file" name="files" multiple>
+			</div>
+			<div class="modal-footer">
+				<button class="btn" data-dismiss="modal" aria-hidden="true">
+					{{ LanguageResources.const.Close[session['language']] }}
+				</button>
+				<button class="btn btn-success" name="upload" type="submit">
+					{{ LanguageResources.const.ProblemUpload[session['language']] }}
+				</button>
+			</div>
+		</form>
+	</div>
+
+	<!-- Problem Modify -->
+	<form method="post">
+	<div class="modal hide fade span10" id="problemModifyModal"
+		  aria-labelledby="modifyModalLabel"
+		  role="dialog" tabindex="-1">
+		<div class="modal-header">
+			<button class="close" data-dismiss="modal" type="button"
+					  aria-hidden="true">
+			  	x
+		  	</button>
+			<h3 id="modifyModalLabel">
+				{{ LanguageResources().const.Problem[session['language']] }}
+				{{ LanguageResources().const.Modification[session['language']] }}
+			</h3>
+		</div>
+		
+		<div class="modal-body">
+			<p></p>
+			<table class="table table-bordered" style = "margin-top:10px">
+				<thead>
+					<tr>
+						<td>
+							{{ LanguageResources().const.Name[session['language']] }}
+						<td>
+							{{ LanguageResources().const.Difficulty[session['language']] }}
+						<td>
+							{{ LanguageResources().const.CheckType[session['language']] }}
+						<td>
+							{{ LanguageResources().const.Limitation[session['language']] }}
+							{{ LanguageResources().const.Time[session['language']] }}(ms)
+						<td>
+							{{ LanguageResources().const.Limitation[session['language']] }}
+							{{ LanguageResources().const.Memory[session['language']] }}(MB)
+				<tbody id = "modifyProblemTableBody">
+			</table>
+		</div>
+		
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">
+				{{ LanguageResources.const.Close[session['language']] }}
+			</button>
+			<button class="btn btn-info" type="submit" name ="problemModify">
+				{{ LanguageResources.const.Confirm[session['language']] }}
+			</button>
+			<!-- In IE, it doesn't send its form values to server if 'form tags' are out of '<form></form>'  -->
+		</div>
+	</div>
+
+	<!-- Problem deletion -->
+	<div class="modal hide fade" id="deleteModal"
+		  aria-hidden="true" aria-labelledby="deleteModalLabel"
+		  role="dialog" tabindex="-1">
+		<div class="modal-header">
+			<button class="close" data-dismiss="modal" type="button"
+					  aria-hidden="true">
+			  	x
+		  	</button>
+			<h3 id="deleteModalLabel">
+				{{ LanguageResources.const.Problem[session['language']] }}
+				{{ LanguageResources.const.Deletion[session['language']] }}
+			</h3>
+		</div>
+		<div class="modal-body">
+			<p>{{ LanguageResources().const.ReallyDeletion[session['language']] }}</p>
+		</div>
+		<div class="modal-footer">
+			
+			<button class="btn" data-dismiss="modal" aria-hidden="true">
+				{{ LanguageResources.const.Close[session['language']] }}
+			</button>
+			<button class="btn btn-danger" type="submit" name ="problemDeleted">
+				{{ LanguageResources.const.Confirm[session['language']] }}
+			</button>
+			<!-- In IE, it doesn't send its form values to server if 'form tags' are out of '<form></form>'  -->
+		</div>
+	</div>
+
+	<!-- No items choosed when deletion button's clicked -->
+	<div class="modal hide fade" id="deleteNoItem" 
+		  aria-labelledby="deleteModalLabel" aria-hidden="true"
+		  role="dialog" tabindex="-1" style="width:200px">
+		<div class="modal-header">
+			<button class="close" data-dismiss="modal" type="button"
+					  aria-hidden="true">
+			  	x
+		  	</button>
+			<h3 id="deleteModalLabel">
+				{{ LanguageResources.const.Problem[session['language']] }}
+				{{ LanguageResources.const.Deletion[session['language']] }}
+			</h3>
+		</div>
+		<div class="modal-body">
+			<p>{{ LanguageResources().const.NoSelect[session['language']] }}</p>
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">
+				{{ LanguageResources.const.Close[session['language']] }}
+			</button>
+		</div>
+	</div>
+
+
+	<!-- 
+		@@ Showing registered problems
+	-->
+	
+	<div class="tabbable">
+		<ul class="nav nav-tabs">
+		<!-- ALL Tab Case -->
+		{% if problemLevel == LanguageResources().const.All[1] %}
+		<li class="active">
+			<a href ="#{{ LanguageResources().const.All[1] }}" data-toggle="tab">
+			 {{ LanguageResources().const.All[session['language']] }}
+			</a>
+		</li>
+		{% else %}
+		<li>
+			<a href = '{{ url_for ("GradeServer.manage_problem",
+														 problemLevel = LanguageResources().const.All[1],
+														 pageNum = 1) }}'>
+			 {{ LanguageResources().const.All[session['language']] }}
+			</a>
+		</li>
+		{% endif %}
+		
+		<!-- tab active setting -->
+		{% for level in levels %}
+			{% if level[1] == problemLevel %}
+			<li class="active">
+				<a href = '#{{ level[1] }}' data-toggle="tab">
+					{{ level[session['language']] }}
+				</a>
+			</li>
+			{% else %}
+			<li>
+				<a href = '{{ url_for ("GradeServer.manage_problem", problemLevel = level[1], pageNum = 1) }}'>
+					{{ level[session['language']] }}
+				</a>
+			</li>
+			{% endif %}
+		{% endfor %}
+		</ul>
+		<!-- Buttons to modify, add and delete problem -->
+		<div style="text-align:right">
+			<a class="btn btn-info" data-toggle="modal" role="button" id = "modifyProblem" onClick = "modifyProblems()">
+				{{ LanguageResources().const.Modification[session['language']] }} <i class = "icon-edit"></i>
+			</a>
+			<a class="btn btn-success" data-toggle="modal" role="button" href="#addModal">
+				{{ LanguageResources.const.Addition[session['language']] }} <i class = "icon-file"></i>
+			</a>
+			<a class="btn btn-danger" data-toggle="modal" role="button"
+				onclick="showingDeleteModal()">
+				{{ LanguageResources.const.Deletion[session['language']] }} <i class = "icon-trash"></i>
+			</a>
+		</div>
+		<!-- posts -->
+		<div class="tab-content">
+		<!-- ActiveTab posts -->
+			<div id="{{ problemLevel }}" class = 'active'>
+				<table class="table table-bordered" id="registeredProblems"
+						style="margin-top:10px">
+					<thead>
+						<tr>
+							<td>
+								{{ LanguageResources().const.Name[session['language']] }}
+							<td>
+								{{ LanguageResources().const.CheckType[session['language']] }}
+							<td>
+								{{ LanguageResources.const.Check[session['language']] }}
+								<input class="checkAll" type="checkbox" style="margin:0px"
+										onclick="selectAllCheckboxes('registeredProblems');">
+					<tbody>
+						{%- for problemRecord in problemRecords %}
+						<tr>
+							<td>
+								{{ problemRecord.problemName }}
+							<td>
+								{{ problemRecord.solutionCheckType }}
+							<td>
+								<label class="checkbox-center">
+									<input class="box-check" id = "problemIndex{{ problemRecord.problemIndex }}" name="{{ problemRecord.problemIndex }}"
+											type="checkbox" value="{{ problemRecord.problemIndex }}">
+								</label>
+						{% endfor -%}
+					</form> <!-- for IE, we need to cover all 'form tags' into the '<form>' tag between -->
+				</table>
+				<!-- page number section -->
+				<div class="pagination pagination-centered">
+					<ul>
+						{%- if pages['pageNum'] > pages['BLOCK'] %}
+						<li>
+							<a href="{{ url_for ('GradeServer.manage_problem', problemLevel = problemLevel, pageNum =pages['pageNum'] - 1) }}"><</a>
+						{% endif -%}
+						
+						{%- for i in range (pages['startPage'], pages['endPage'] +1) %}
+						<li>
+							{%- if pages['pageNum'] == i %}
+							<a style ='background-color:gray'>
+							{%- else %}
+							<a href="{{ url_for ('GradeServer.manage_problem', problemLevel = problemLevel, pageNum = i) }}">
+							{% endif -%}
+								{{ i }}
+							</a>
+						{% endfor -%}
+						
+						{%- if pages['endPage'] < pages ['allPage'] %}
+						<li>
+							<a href="{{ url_for ('GradeServer.manage_problem', problemLevel = problemLevel, pageNum =pages['pageNum'] + 1) }}">></a>
+						{% endif -%}
+				</div>
+				<!-- End Paging -->
+			</div>
+		</div>
+		<!-- end posts -->
+	</div>
+</div>
+
+<script>
+$(function(){
+	// modal position re-place event for initial
+	placeModalCenter("addModal");
+	placeModalCenter("problemModifyModal");
+	placeModalCenter("deleteModal");
+	placeModalCenter("deleteNoItem");
+	$(window).resize(function(){
+		// when resize the window size
+		placeModalCenter("addModal");
+		placeModalCenter("problemModifyModal");
+		placeModalCenter("deleteModal");
+		placeModalCenter("deleteNoItem");
+	});
+});
+
+function modifyProblems () {
+
+	// Modal Setting
+	document.getElementById ("modifyProblem").href = "#problemModifyModal" ;
+	
+	// Get Choose items
+	tbodyHTML = "" ;
+	{% for problemRecord in problemRecords %}
+	
+		checked = document.getElementById ("problemIndex{{ problemRecord.problemIndex }}") ;
+		if (checked.checked == true) {
+			// set <tr> 
+			tbodyHTML +=
+									"<tr>" +
+										"<td>" +
+											"{{ problemRecord.problemName }}" +
+										"<td>" +
+											"<select class='span2' type='text' name='problemDifficulty{{ problemRecord.problemIndex }}'>" +
+												{% for level in levels %}
+												"<option value = '{{ level[1] }}'" +
+													{% if problemRecord.problemDifficulty == level[1]|upper %}
+													"selected = 'selected'" +
+													{% endif %}">" +
+													"{{ level[session['language']] }}" +
+												"</option>" +
+												{% endfor %}
+											"</select>" +
+										"<td>" +
+											"<select class='span2' type='text' name='problemType{{ problemRecord.problemIndex }}'>" +
+												{% for type in types %}
+												"<option value = '{{ type }}'" +
+													{% if problemRecord.solutionCheckType == type %}
+													"selected = 'selected'" +
+													{% endif %}">" +
+													"{{ type }}" +
+												"</option>" +
+												{% endfor %}
+											"</select>" +
+										"<td>" +
+											"<input class='span1' name='limitedTime{{ problemRecord.problemIndex }}' type='text'" +
+														  "style='text-align:center' value='{{ problemRecord.limitedTime }}' autocomplete='off'>" +
+										"<td>" +
+											"<input class='span1' name='limitedMemory{{ problemRecord.problemIndex }}' type='text'" +
+														  "style='text-align:center' value='{{ problemRecord.limitedMemory }}' autocomplete='off'>" ;
+		}
+	{% endfor %}
+	// Insert <tr>
+	document.getElementById ("modifyProblemTableBody").innerHTML = tbodyHTML ;
+}
+</script>
+
+{% endblock -%}

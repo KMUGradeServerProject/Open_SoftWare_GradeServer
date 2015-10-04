@@ -1,0 +1,357 @@
+<!-- //////////////////////////////////////////
+		fill every "here" sign using jinja2 template
+		/////////////////////////////////////////// -->
+
+{%- extends "main.html" -%}
+{%- block body %}
+
+<div class="container">
+	{%- if browserName == 'msie' and browserVersion|length != 4 %}
+	<h2>{{ LanguageResources().const.LowerBrowser[session['language']] }}</h2>
+	<h4>
+		<a href = "{{ LanguageResources().const.BrowserAddress[0] }}">
+			{{ LanguageResources().const.IE[session['language']] }}
+		</a>
+		&nbsp;
+		<a href = "{{ LanguageResources().const.BrowserAddress[1] }}">
+			{{ LanguageResources().const.Chrome[session['language']] }}
+		</a>
+	</h4>
+	{%- else %}
+	<h3>{% if problemName %}{{ problemName }}{% endif %}</h3>
+	<!-- code information -->
+	<div class="container">
+		<table class="user_code table table-bordered">
+			<div class="span3">
+				<thead>
+					<tr>
+						<td>
+							{{ LanguageResources.const.ID[session['language']] }}
+						<td>
+							{{ LanguageResources.const.Runtime[session['language']] }}
+						<td>
+							{{ LanguageResources.const.Memory[session['language']] }}
+						<td>
+							{{ LanguageResources.const.FileSize[session['language']] }}
+					</tr>
+				</thead>
+				<tr>
+					<td>
+						<a href='{{ url_for("GradeServer.submission_record",
+												memberIdIndex = memberIdIndex,
+												sortCondition = LanguageResources().const.SubmissionDate[1],
+												pageNum = 1) }}'>
+						 {% if problemSolvedMemberRecords.memberId %}{{ problemSolvedMemberRecords.memberId }}{% endif %}
+						 </a>
+					<td>{% if problemSolvedMemberRecords.runTime %}{{ problemSolvedMemberRecords.runTime }}{% else %}0{% endif %} ms
+					<td>{% if problemSolvedMemberRecords.usedMemory %}{{ problemSolvedMemberRecords.usedMemory }}{% else %}0{% endif %} MB
+					<td>{% if problemSolvedMemberRecords.sumOfSubmittedFileSize %}{{ problemSolvedMemberRecords.sumOfSubmittedFileSize }}{% endif %} Byte
+				</tr>
+			</div>
+		</table>
+	</div>
+	<!-- end code information -->
+	
+	<!-- code section -->
+	<div class="container">
+		<!-- put the code here -->
+		<div class="tabbable">
+			
+			<ul class="nav nav-tabs">
+				{% for fileInfo in submittedFileRecords %}
+					{% if loop.index0 == 0 %}
+					<li class = 'active'> 
+					{% else %}
+					<li class>
+					{% endif %}
+					<a href="#{{ loop.index0 }}" data-toggle="tab">{% if fileInfo.fileName %}{{ fileInfo.fileName }}{% endif %}</a></li>
+				{% endfor %}
+				
+				{# Article Like Case #}
+				<button class="btn btn-link codeLikeClick"style = "display:inline">
+				{% if isLikeCancelled == 'FALSE' %}
+					{{ LanguageResources.const.DisLike[session['language']] }} <i class="icon-thumbs-down"></i>
+				{% else %}
+					{{ LanguageResources.const.Like[session['language']] }} <i class="icon-thumbs-up"></i>
+				{% endif %}
+					<!-- Article Like Count -->
+				{{ sumOfLikeCount }}
+				</button>
+			</ul>
+			
+			<div class="tab-content">
+			<!-- File Content -->
+			{% for fileInfo in submittedFileRecords %}
+					{% if not loop.index0 %}
+				<div id="{{ loop.index0 }}" class="tab-pane active">
+					{% else %}
+				<div id="{{ loop.index0 }}" class="tab-pane">
+					{% endif %}
+					</select>{{ LanguageResources.const.Theme[session['language']] }} :
+					<select type = "text" onchange="selectTheme{{ loop.index0 }}(this)">
+						<option value = "6"> chrome </option>
+						<option value = "7"> clouds </option>
+						<option selected = "selected" value = "8"> eclipse </option>
+						<option value = "9"> github </option>
+						<option value = "10"> monokai </option>
+						<option value = "11"> textmate </option>
+						<option value = "12"> tomorrow </option>
+					</select>
+					<pre id="editor{{ loop.index0 }}">{{ fileData[loop.index0] }}</pre>
+				</div>
+			{% endfor %}
+			</div>
+		</div>
+	</div>
+	
+	<!-- comment section -->
+	<div class="container">
+
+		<form id = "writeReplyForm" method="post">
+			<div class='row-fluid' style='margin-bottom:10px'>
+				<div class='span10'>
+					<textarea name="writeCodeReply"
+										style="width:100%; height: {{ OtherResources().const.REPLY_ROW }}px; max-height: {{ OtherResources().const.MAX_ROW }}px;"
+										wrap = "hard"
+										onkeyup="autoSize(this, {{ OtherResources().const.REPLY_ROW }}, {{ OtherResources().const.MAX_ROW }})" autocomplete="off"
+										placeholder="Comment"type = "text"></textarea>
+				</div>
+				<div class="span2">
+					<button class="btn btn-primary submit" style="margin-top:2px;width:100%;height:50px">
+						{{ LanguageResources.const.Write[session['language']] }} <i class="icon-pencil"></i>
+					</button>
+				</div>
+			</div>
+		</form>
+
+		<form method = "POST">
+			<!-- Delete Reply Modal Views -->
+			<div id="deleteCodeReply" class="modal hide fade" style="text-align:center">
+				<div class="modal-header">
+					<h3>
+						{{ LanguageResources.const.Reply[session['language']] }} {{ LanguageResources.const.Deletion[session['language']] }}
+					</h3>
+				</div>
+				<div class="modal-body">
+					<p>{{ LanguageResources().const.ReallyDeletion[session['language']] }}</p>
+				</div>
+				<div class="modal-footer">
+					<button class="btn" data-dismiss="modal" aria-hidden="true">
+						{{ LanguageResources.const.Close[session['language']] }}
+					</button>
+					<button class="delete btn btn-danger"
+							  	id="deleteCodeReplyModal"
+							  	type="submit">
+						{{ LanguageResources.const.Confirm[session['language']] }}
+					</button>
+				</div>
+			</div>
+		</form>
+		{% for repliesOnSubmissionRecord in repliesOnSubmissionRecords %}
+		<hr style ='margin-top:0%;margin-bottom:0%'>
+		<div class='row-fluid'>
+	
+			<!-- Content, updateDate -->
+			<div class='row-fluid'>
+				<div class="span10">
+					
+					<div style="display:inline">
+						<a href='{{ url_for ("GradeServer.submission_record",
+																 memberIdIndex = repliesOnSubmissionRecord.codeReplierIdIndex,
+																 sortCondition= LanguageResources().const.SubmissionDate[1],
+																 pageNum=1) }}'>
+							{% if repliesOnSubmissionRecord.memberId %}
+								{{ repliesOnSubmissionRecord.memberId }}
+							{% endif %}
+						</a>
+						:
+						{% if repliesOnSubmissionRecord.codeRepliedDate %}
+							{{ repliesOnSubmissionRecord.codeRepliedDate }}
+						{% endif %}
+						
+						<!-- like button -->
+						<button class="like btn btn-link replyLikeClick" id = "replyLike{{ repliesOnSubmissionRecord.submissionReplyIndex }}">
+						{% if not repliesOnSubmissionIsLikeRecords[loop.index0]
+									or repliesOnSubmissionIsLikeRecords[loop.index0].isLikeCancelled == ENUMResources().const.TRUE %} 
+							<i class="icon-thumbs-up"></i>
+						{% else %} 
+							<i class="icon-thumbs-down"></i>
+						{% endif %}
+							{{ repliesOnSubmissionRecord.sumOfLikeCount }}
+						</button>
+					</div>
+						
+					<form method="post" style="display:inline">
+						<!-- delete button -->
+						<!-- replier and masters are availables to delete the comments -->
+						{% if repliesOnSubmissionRecord.memberId == session['memberId']
+									or 'ADMINISTRATOR' in session['authority'] %}
+						<!-- Dlelete Reply Button -->
+						<a id ="deleteCodeReply{{ repliesOnSubmissionRecord.submissionReplyIndex }}"
+							 role="button" class="btn btn-link" data-toggle="modal"
+							 onClick = "deleteCodeReply(this)">
+							<i class="icon-trash"></i>
+						</a>
+						{% endif %}
+					</form>
+					
+					{% if repliesOnSubmissionRecord.memberId == session['memberId'] %}
+					<!-- modify Reply Button -->
+					<div style="display:inline">
+						<button class="btn btn-link"
+							onclick="modifyCodeReply({{ repliesOnSubmissionRecord.submissionReplyIndex }})" role="button" >
+							<i id ="modifCodeReplyIcon{{ repliesOnSubmissionRecord.submissionReplyIndex }}" class="icon-pencil"></i>
+						</button>
+					</div>
+					{% endif %}
+					
+					<form id = "modifyReplyForm{{ repliesOnSubmissionRecord.submissionReplyIndex }}" method="POST">
+						<!-- Reply Content Views -->
+						<textarea name="modifyCodeReplyContent{{ repliesOnSubmissionRecord.submissionReplyIndex }}"
+											style="width:100%; height: {{ OtherResources().const.REPLY_ROW }}px; max-height: {{ OtherResources().const.MAX_ROW }}px; display:none" autofocus="autofocus"
+											onfocus="autoSize(this, {{ OtherResources().const.REPLY_ROW }}, {{ OtherResources().const.MAX_ROW }})"
+											onkeyup="autoSize(this, {{ OtherResources().const.REPLY_ROW }}, {{ OtherResources().const.MAX_ROW }})"
+											autocomplete="off" placeholder="Comment"type = "text">{% if repliesOnSubmissionRecord.codeReplyContent %}{{ repliesOnSubmissionRecord.codeReplyContent }}{% endif %}</textarea>
+						
+						<pre id="codeReplyContent{{ repliesOnSubmissionRecord.submissionReplyIndex }}"
+								 style="overflow: auto; width:100%; height: {{ OtherResources().const.REPLY_ROW }}px; max-height: {{ OtherResources().const.MAX_ROW }}px;"
+								 onclick="autoSize(this, {{ OtherResources().const.REPLY_ROW }}, {{ OtherResources().const.MAX_ROW }})">{% if repliesOnSubmissionRecord.codeReplyContent %}{{ repliesOnSubmissionRecord.codeReplyContent }}{% endif %}
+						</pre>
+					</div>
+					
+					<div class="span2" style="margin-top:35px">
+						<button class="btn btn-primary submit" id="modifyCodeReplyConfirm{{ repliesOnSubmissionRecord.submissionReplyIndex }}" 
+							style="width:100%;height:50px; display:none">
+							{{ LanguageResources.const.Confirm[session['language']] }}
+						</button>
+					</div>
+					</form>
+				</div>
+		</div>
+		{% endfor %}
+	</div>
+	{% endif %}
+</div>	
+
+<style> textarea {width:300px; overflow:visible} </style>
+<script>
+	
+	// delete Article reply
+	function deleteCodeReply (obj) {
+		
+		// Set href (modal)
+		obj.href = "#deleteCodeReply" ;
+		
+		// set Name
+		$("#deleteCodeReplyModal").attr("name", "deleteCodeReply" + obj.id.substring("deleteCodeReply".length)) ;
+	}
+		
+	{% for fileInfo in submittedFileRecords %}
+	var editor{{ loop.index0 }} = ace.edit("editor{{ loop.index0 }}");
+	ace.require("ace/ext/language_tools");
+	
+	editor{{ loop.index0 }}.setTheme("ace/theme/eclipse");
+	{% if '.java' in fileInfo.fileName %}
+		editor{{ loop.index0 }}.session.setMode("ace/mode/java");
+	{% elif '.py' in fileInfo.fileName %}
+		editor{{ loop.index0 }}.session.setMode("ace/mode/python");
+	{% else %}
+		editor{{ loop.index0 }}.session.setMode("ace/mode/c_cpp");
+	{% endif %}
+	
+	editor{{ loop.index0 }}.setAutoScrollEditorIntoView(true);
+	editor{{ loop.index0 }}.setOption("maxLines", 70);
+	editor{{ loop.index0 }}.setOption("minLines", 20);
+	editor{{ loop.index0 }}.setOption("showPrintMargin", false);
+	
+
+	// language change
+	function selectTheme{{ loop.index0 }}(selectObj) {
+		var theme;
+		if(selectObj.value == 6){ theme = "chrome"; }
+		if(selectObj.value == 7){ theme = "clouds"; }
+		if(selectObj.value == 8){ theme = "eclipse"; }
+		if(selectObj.value == 9){ theme = "github"; }
+		if(selectObj.value == 10){ theme = "monokai"; }
+		if(selectObj.value == 11){ theme = "textmate"; }
+		if(selectObj.value == 12){ theme = "tomorrow"; }
+	
+	  editor{{ loop.index0 }}.setTheme("ace/theme/" + theme);
+	}
+	{% endfor %}
+	
+	// Modify Reply
+	function modifyCodeReply (submissionReplyIndex) {
+		
+		modifyIcon = document.getElementById("modifCodeReplyIcon" + submissionReplyIndex) ;
+		if (modifyIcon.className == "icon-pencil") {
+			modifyIcon.className = "icon-remove-sign" ;
+		
+			document.getElementsByName("modifyCodeReplyContent" + submissionReplyIndex)[0].style.display = 'block' ;
+			
+			document.getElementById("modifyCodeReplyConfirm" + submissionReplyIndex).style.display = 'block' ;
+			document.getElementById("codeReplyContent" + submissionReplyIndex).style.display = 'none' ;
+			try{
+				$("#modifyReplyForm" + submissionReplyIndex).validate() ;
+				$("#modifyCodeReplyContent" + submissionReplyIndex).rules("add", {required: true}) ;
+			} catch (err){
+			}
+		}
+		else {
+			modifyIcon.className = "icon-pencil" ;
+			
+			document.getElementsByName("modifyCodeReplyContent" + submissionReplyIndex)[0].style.display = 'none' ;
+			
+			document.getElementById("modifyCodeReplyConfirm" + submissionReplyIndex).style.display = 'none' ;
+			document.getElementById("codeReplyContent" + submissionReplyIndex).style.display = 'block' ;
+		}
+	}
+	
+  
+	$(function(){
+		// Code Like
+		$('.codeLikeClick').click(function() {
+			$.ajax({
+			  type: "POST",
+	  		url: "/code_like_click%3FsubmissionIndex={{ submissionIndex }}",
+	  		success : function(response) {
+  				if ($(".codeLikeClick").html().indexOf("icon-thumbs-up") != -1) {
+						$(".codeLikeClick").html("{{ LanguageResources.const.DisLike[session['language']] }} <i class='icon-thumbs-down'></i> " + response) ;
+					}
+					else {
+						$(".codeLikeClick").html("{{ LanguageResources.const.Like[session['language']] }} <i class='icon-thumbs-up'></i> " + response) ;
+					}
+	  			}
+			});
+		});
+		
+		// ReplyLike
+		$('.replyLikeClick').click(function() {
+			var index = $(this).attr("id").substring("replyLike".length) ;
+			
+			$.ajax({
+			  type: "POST",
+	  		url: "/code_reply_like_click%3FsubmissionReplyIndex=" + index,
+	  		success : function(response) {
+	  			if ($("#replyLike" + index).html().indexOf("icon-thumbs-up") != -1) {
+						$("#replyLike" + index).html("<i class='icon-thumbs-down'></i> " + response) ;
+					}
+					else {
+						$("#replyLike" + index).html("<i class='icon-thumbs-up'></i> " + response) ;
+					}
+	  				
+	  			}
+			});
+		});
+		
+		$("#writeReplyForm").validate({
+			rules: {
+				'writeCodeReply': {
+					required: true
+				}
+			}
+		}) ;
+	});
+	
+</script>
+{% endblock -%}

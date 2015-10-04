@@ -1,0 +1,233 @@
+<!-- 
+	@@ class_user_submit.html
+
+	The page when server administrator manages college and department.
+	author: seulgi choi & uijae lee
+-->
+
+{%- extends "main.html" -%}
+{%- block body %}
+
+<div class="container">
+	<h3>
+		{{ LanguageResources.const.User[session['language']] }}
+		{{ LanguageResources.const.Submission[session['language']] }}
+		{{ LanguageResources.const.Management[session['language']] }}
+	</h3>
+	
+	<div class="tabbable">
+		<a class="tab-left">&lsaquo;</a>
+		<a class="tab-right">&rsaquo;</a>
+		<ul class="nav nav-tabs" id="board-tabs" style="position:relative;margin-bottom:10px">
+		
+		<!-- Accept Course Tab Case -->
+		{% for course in courses %}
+		{# TabActive Setting #}
+			
+			{% if course.courseIndex == courseTabIndex|int %}
+			<li class="active">
+				<a href = "#{{ course.courseIndex }}" data-toggle="tab">
+					{% if course.courseName %}{{ course.courseName }}{% endif %}
+				</a>
+			</li>
+			{% else %}
+			<li>
+				<a href = '{{ url_for ("GradeServer.class_user_submit",
+															 pageNum = 1) }}'>
+					{% if course.courseName %}{{ course.courseName }}{% endif %}
+				</a>
+			</li>
+			{% endif %}
+		{% endfor %}
+		</ul>
+		
+		<!-- posts -->
+		<div class="tab-content">
+		<!-- ActiveTab posts -->
+			<div id="{{ courseTabIndex }}" class = 'active'>
+				<table class="table table-bordered" id ="A">
+					<thead>
+						<tr>
+							<td colspan = 4>
+								{{ LanguageResources.const.ProblemTitle[session['language']] }}
+					<tbody>
+						{% for problemListRecord in problemListRecords %}
+						<tr class = 'label-searchLine btn-link' id = 'problem{{ problemListRecord.problemIndex }}' onClick = "showSubmissions(this)">
+							<td colspan = 4>
+								{%- if problemListRecord.problemName %}{{ problemListRecord.problemName }}{% endif -%}
+							<td align="center" colspan = 5>
+								{{ get_datetime_delete_sceond(problemListRecord.startDateOfSubmission) }}
+								<br>
+								{{ get_datetime_delete_sceond(problemListRecord.endDateOfSubmission) }}
+							
+							<!-- Submissions in problem -->
+							<thead>
+								<tr class = "hidden" id = "submissionsLabel{{ problemListRecord.problemIndex }}">
+									<td>
+										{{ LanguageResources().const.ID[session['language']] }}
+									<td>
+										{{ LanguageResources().const.Name[session['language']] }}
+									<td>
+										{{ LanguageResources().const.Status[session['language']] }}
+									<td>
+										{{ LanguageResources().const.Score[session['language']] }}
+									<td>
+											{{ LanguageResources().const.Runtime[session['language']] }} (ms)
+									<td>
+											{{ LanguageResources().const.Memory[session['language']] }} (KB)
+									<td>
+											{{ LanguageResources().const.FileSize[session['language']] }}(Byte)
+									<td>
+											{{ LanguageResources().const.SubmissionDate[session['language']] }}
+									<td>
+										{{ LanguageResources.const.Code[session['language']] }}
+							</thead>
+							{% for problemResultRecord in problemResultRecords[loop.index0] %}
+							<tr class = "{%- if problemResultRecord.status == "SOLVED" %}solved
+						      {% elif problemResultRecord.status == None %} never_submitted
+						      {% elif problemResultRecord.status == "SERVER_ERROR" %}server_error
+				      		{% elif problemResultRecord.status == "JUDGING" %}judging
+				      		{% else %}etc_error
+						      {% endif -%} hidden" name = "submissions{{ problemListRecord.problemIndex }}">
+								<td>
+									{% if problemResultRecord.memberId %}{{ problemResultRecord.memberId }}{% endif %}
+								<td>
+									{% if problemResultRecord.memberName %}{{ problemResultRecord.memberName }}{% endif %}
+								<td>
+									{% if problemResultRecord.status %}
+										{% if problemResultRecord.status == ENUMResources().const.NEVER_SUBMITTED %}
+										{{ LanguageResources().const.NeverSubmitted[session['language']] }}
+										{% elif problemResultRecord.status == ENUMResources().const.SOLVED %}
+										{{ LanguageResources().const.Solved[session['language']] }}
+										{% elif problemResultRecord.status == ENUMResources().const.TIME_OVER %}
+										{{ LanguageResources().const.TimeOver[session['language']] }}
+										{% elif problemResultRecord.status == ENUMResources().const.MEMORY_OVERFLOW %}
+										{{ LanguageResources().const.MemoryOverflow[session['language']] }}
+										{% elif problemResultRecord.status == ENUMResources().const.JUDGING %}
+										{{ LanguageResources().const.Judging[session['language']] }}
+										{% elif problemResultRecord.status == ENUMResources().const.RUNTIME_ERROR %}
+										{{ LanguageResources().const.RuntimeError[session['language']] }}
+										{% elif problemResultRecord.status == ENUMResources().const.SERVER_ERROR %}
+										{{ LanguageResources().const.ServerError[session['language']] }}
+										{% elif problemResultRecord.status == ENUMResources().const.WRONG_ANSWER %}
+										{{ LanguageResources().const.WrongAnswer[session['language']] }}
+										{% elif problemResultRecord.status == ENUMResources().const.COMPILE_ERROR %}
+										{{ LanguageResources().const.CompileError[session['language']] }}
+										{% endif %}
+										
+									{% else %}{{ LanguageResources().const.NeverSubmitted[session['language']] }}
+									{% endif %}
+								<td>
+									{% if problemResultRecord.score %}{{ problemResultRecord.score }}
+									{% else %}0
+									{% endif %}
+								<td>
+									{% if problemResultRecord.runTime %}
+									{{ problemResultRecord.runTime }}
+									{% else %}
+									0
+									{% endif %}
+								 	ms
+							 	<td>
+									{% if problemResultRecord.usedMemory %}
+									{{ problemResultRecord.usedMemory }}
+									{% else %}
+									0
+									{% endif %}
+									KB
+								<td>
+									{% if problemResultRecord.sumOfSubmittedFileSize %}
+									{{ problemResultRecord.sumOfSubmittedFileSize }}
+									{% else %}
+									0
+									{% endif %}
+									<span class="hidden-phone hidden-tablet"> Byte</span>
+									<span class="visible-phone visible-tablet"> B</span>
+								<td>
+									{% if problemResultRecord.codeSubmissionDate %}
+									{{ get_datetime_delete_sceond(problemResultRecord.codeSubmissionDate) }}
+									{% endif %}
+								<td style ='vertical-align'>
+									{% if (SETResources().const.SERVER_ADMINISTRATOR in session[SessionResources().const.AUTHORITY]
+						            or SETResources().const.ADMINISTRATOR in session[SessionResources().const.AUTHORITY]
+						           	or SETResources().const.FREE_ADMINISTRATOR in session[SessionResources().const.AUTHORITY])
+						           	and problemResultRecord.status %}
+									<a href='{{ url_for("GradeServer.submission_code",
+																			status = problemResultRecord.status,
+																			problemIndex = problemListRecord.problemIndex,
+																			memberIdIndex = problemResultRecord.memberIdIndex) }}'>
+										<i class="icon-file"></i>
+									</a>
+									{% endif %}
+							{% endfor %}
+					{% endfor %}
+				</table>
+				
+				<!-- Paging -->
+				<div class="pagination pagination-centered">
+					<ul>
+						{%- if pages['startPage'] > 1 %}
+						<li>
+							<a href = '{{ url_for ("GradeServer.class_user_submit",
+																		 pageNum = pages['pageNum'] -1) }}'>
+								<
+							</a>
+						</li>
+						{% endif -%}
+						
+						{%- for i in range (pages['startPage'], pages['endPage'] +1) %}
+						<li>
+							{% if pages['pageNum'] == i %}
+							<a style ='background-color:gray'>
+							{% else %}
+							<a href = '{{ url_for ("GradeServer.class_user_submit",
+																		 pageNum = i) }}'>
+							{% endif %}
+							{{ i }}
+							</a>
+						</li>
+						{% endfor -%}
+						
+						{%- if pages['endPage'] < pages['allPage'] %}
+						<li>
+							<a href = '{{ url_for ("GradeServer.class_user_submit",
+																		 pageNum = pages['pageNum'] +1) }}'>
+								>
+							</a>
+						</li>
+						{% endif -%}
+					</ul>
+				</div>
+				<!-- End Paging -->
+			</div>
+		</div>
+		<!-- end posts -->
+	</div>
+</div>
+
+<script>
+	// Submissions in problem
+	function showSubmissions(obj) {
+		var splitStr  = "problem" ;
+		var index = obj.id.substring(splitStr.length) ;
+		
+		// show or hidden 
+		var theadStr = "submissionsLabel", contentStr = "submissions" ;
+		var thead = document.getElementById (theadStr + index),
+				content = document.getElementsByName (contentStr + index) ;
+		
+		if (thead.className.indexOf("hidden") >= 0  && content[0].className.indexOf("hidden") >= 0) {
+			thead.className = "" ;
+			for (var i = 0 ; i < content.length ; i++)
+				content[i].className = content[i].className.replace(/hidden/gi, "") ;
+		}
+		else {
+			thead.className = "hidden" ;
+			for (var i = 0 ; i < content.length ; i++)
+				content[i].className += " hidden" ;
+		}
+	}
+	
+</script>
+<script src="../../static/bootstrap/js/userdefine-tabs.js"></script>
+{% endblock -%}

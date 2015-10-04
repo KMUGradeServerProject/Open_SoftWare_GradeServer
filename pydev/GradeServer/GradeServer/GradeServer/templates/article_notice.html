@@ -1,0 +1,170 @@
+<!-- //////////////////////////////////////////
+		fill every "here" sign using jinja2 template
+		/////////////////////////////////////////// -->
+		
+{% extends "main.html" %}
+{%- block body %}
+<script>
+	function filterConditions (viewStr, nameStr){
+                 	
+		var dropDownCondition = document.getElementById("dropDownCondition") ;
+		dropDownCondition.innerHTML = viewStr + "<b class = 'caret'></b>" ;
+		
+		var filterCondition = document.getElementById("filterCondition") ;
+		filterCondition.name = nameStr ;
+     }
+</script>
+            
+<div class="container">
+	
+		
+			<!-- Write Button -->
+			<div style="text-align:right">
+			{% if 'ADMINISTRATOR' in session['authority'] %}
+				<a href="{{ url_for('GradeServer.write', articleIndex =0) }}">
+					<button type="button" class="write btn btn-info">
+						{{ LanguageResources.const.Write[session['language']] }} <i class="icon-pencil"></i>
+					</button>
+				</a>
+			{% endif %}
+			</div>
+		
+				<table class="table">
+					<thead>
+						<tr>
+							<td>
+								{{ LanguageResources.const.Number[session['language']] }}
+							<td>
+								{{ LanguageResources.const.ArticleType[session['language']] }}
+							<td>
+								{{ LanguageResources.const.Title[session['language']] }}
+							<td>
+								{{ LanguageResources.const.Writer[session['language']] }}
+							<td>
+								{{ LanguageResources.const.UpdateDate[session['language']] }}
+							<td>
+								{{ LanguageResources.const.ViewCount[session['language']] }}
+							<td>
+								{{ LanguageResources.const.Like[session['language']] }}
+						</tr>
+					<tbody>
+					<!-- Notice -->
+					{% for articleNoticeRecord in articleNoticeRecords %}
+					<tr>
+						<td>
+							{{ (pages['count'] - loop.index0) - (pages['pageNum'] - 1) * pages['LIST'] }}
+						<td>
+							{% if articleNoticeRecord.articleType == ENUMResources().const.NOTICE %}
+							{{ LanguageResources().const.Notice[session['language']] }}
+							{% elif articleNoticeRecord.articleType == ENUMResources().const.QUESTION %}
+							{{ LanguageResources().const.Question[session['language']] }}
+							{% elif articleNoticeRecord.articleType == ENUMResources().const.NORMAL %}
+							{{ LanguageResources().const.Normal[session['language']] }}
+							{% endif %}
+						
+						<td>
+							<a href= '{{ url_for ("GradeServer.read", articleIndex = articleNoticeRecord.articleIndex) }}'>
+								{% if articleNoticeRecord.problemName %}
+								[{{ articleNoticeRecord.problemName }}]
+								{% endif %}
+								<script> 
+									// if title is longer than 25 charater, change it to short
+									var title = "{{ articleNoticeRecord.title }}"; 
+									if(title.length >= {{ OtherResources().const.LIMIT_TITLE_VIEW_LENGTH }}){
+										title = title.substring(0, {{ OtherResources().const.TITLE_VIEW_LENGTH }})+"...";
+									}
+									document.write(title);
+								</script>
+							</a>
+							{%- if articleNoticeRecord.replyCount > 0 %}
+								[{{ articleNoticeRecord.replyCount }}]
+							{% endif -%}
+						
+						<td>{% if articleNoticeRecord.memberId %}{{ articleNoticeRecord.memberId }}{% endif %}
+						<td>
+							{% if articleNoticeRecord.updateDate %}
+								{{ get_datetime_delete_sceond(articleNoticeRecord.updateDate) }}
+							{% endif %}
+						<td>{% if articleNoticeRecord.viewCount %}{{ articleNoticeRecord.viewCount }}{% else %}0{% endif %}
+						<td>{% if articleNoticeRecord.sumOfLikeCount %}{{ articleNoticeRecord.sumOfLikeCount }}{% else %}0{% endif %}
+					</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+				
+				<!-- Paging -->
+				<div class="pagination pagination-centered">
+					<ul>
+						{%- if pages['startPage'] > 1 %}
+						<li>
+							<a href="{{ url_for ('GradeServer.article_notice',
+																	 filterCondition = filterCondition,
+														 			 keyWord = keyWord,
+																	 pageNum = pages['pageNum'] -1) }}">
+								<
+							</a>
+						</li>
+						{% endif -%}
+						
+						{%- for i in range (pages['startPage'], pages['endPage'] +1) %}
+						<li>
+							{% if pages['pageNum'] == i %}
+							<a style ='background-color:gray'>
+							{% else %}
+							<a href="{{ url_for ('GradeServer.article_notice',
+																	 filterCondition = filterCondition,
+														 			 keyWord = keyWord,
+																	 pageNum = i) }}">
+							{% endif %}
+							{{ i }}
+							</a>
+						</li>
+						{% endfor -%}
+						
+						{%- if pages['endPage'] < pages['allPage'] %}
+						<li>
+							<a href="{{ url_for ('GradeServer.article_notice',
+																	 filterCondition = filterCondition,
+														 			 keyWord = keyWord,
+																	 pageNum =pages['pageNum'] +1) }}">
+								>
+							</a>
+						</li>
+						{% endif -%}
+					</ul>
+				</div>
+				<!-- End Paging -->
+	
+	<!-- search bar -->
+	<form method ="post">
+			<!-- SearchBar // all -->
+			<div id= '{{ activeTabIndex }}' class="tab-pane active" style="text-align:center">
+				
+				<div class="btn-group">
+					<a class="btn btn-info dropdown-toggle" data-toggle="dropdown" id = 'dropDownCondition'>{{ LanguageResources().const.All[session['language']] }}<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						{% for filter in Filters %}
+						<li>
+							{% if loop.index == Filters|length %}
+							<a onclick = 'filterConditions("{{ filter[0] }}{{ LanguageResources().const.Content[session['language']] }}", "{{ filter[1] }}")'>
+								{{ filter[session['language']] }} & {{ LanguageResources().const.Content[session['language']] }}
+							</a>
+							{% else %}
+							<a onclick = 'filterConditions("{{ filter[0] }}", "{{ filter[1] }}")'>
+								{{ filter[session['language']] }}
+							</a>
+							{% endif %}
+						</li>
+						{% endfor %}
+					</ul>
+				</div>
+
+				<div class="input-append" style="margin-bottom:0px">
+					<input class="span3" name = 'keyWord' type="text" placeholder="Type Keyword">
+					<button id = 'filterCondition' name = '{{ Filters[0][1] }}' class="btn btn-success" type="submit"><i class="icon-search"></i></button>
+				</div>
+			</div>
+	</form>
+	<!-- end search bar -->
+</div>
+{% endblock -%}

@@ -1,0 +1,192 @@
+<!-- 
+	@@ edit_personal.html
+
+	The page when users change their information
+	author: seulgi choi
+-->
+
+{%- extends "main.html" -%}
+{%- block body %}
+<div class="container">
+	<h3>
+		{{ LanguageResources.const.PersonalInformation[session['language']] }}
+	</h3>
+	<!-- ID -->
+	<h4>
+		<div class="row-fluid">
+			<div class="span3">
+				{{ LanguageResources.const.ID[session['language']] }}
+			</div>
+			<div class="span8">
+				{%- if memberInformation.memberId %}{{ memberInformation.memberId }}{% endif -%}
+			</div>
+		</div>
+	</h4>
+	<hr class="hidden-tablet hidden-desktop">
+	
+	<form id="infoForm" method="post">
+		<!-- Password -->
+		<h4>
+			<div class="row-fluid">
+				<div class="span3">
+					{{ LanguageResources.const.Password[session['language']] }}
+				</div>
+				<div class="span8">
+					<input class="input-large" name="password" type="password"
+							placeholder="Input password" 
+							autofocus>
+				</div>
+			</div>
+		</h4>
+		<!-- Password check -->
+		<h4>
+			<div class="row-fluid">
+				<div class="span3">
+					{{ LanguageResources.const.Password[session['language']] }}({{ LanguageResources.const.Confirm[session['language']] }})
+				</div>
+				<div class="span8">
+					<input class="input-large" name="passwordConfirm" type="password"
+							placeholder="Confirm password">
+				</div>
+				<div id="errorMessage"></div>
+			</div>
+		</h4>
+		<hr class="hidden-tablet hidden-desktop">
+		
+		<!-- Information -->
+		<h4>
+			<div class="row-fluid">
+				<div class="span3">
+					{{ LanguageResources.const.Information[session['language']] }}
+				</div>
+				<div class="span8">
+					{%- if memberInformation.detailInformation %}{{ memberInformation.detailInformation }}{% endif -%}
+				</div>
+			</div>
+		</h4>
+		<hr class="hidden-tablet hidden-desktop">
+		
+		<!-- Name -->
+		<h4>
+			<div class="row-fluid">
+				<div class="span3">
+					{{ LanguageResources.const.Name[session['language']] }}
+				</div>
+				<div class="span8">
+					{%- if memberInformation.memberName %}{{ memberInformation.memberName }}{% endif -%}
+				</div>
+			</div>
+		</h4>
+		<hr class="hidden-tablet hidden-desktop">
+		<!-- Contact number -->
+		<h4>
+			<div class="row-fluid">
+				<div class="span3">
+					{{ LanguageResources.const.ContactNumber[session['language']] }}
+				</div>
+				<div class="span8">
+					<input class="h5-phone input-large" name="contactNumber"
+							type="text" placeholder="000-0000-0000"
+							{%- if contactNumber %}
+							value="{{ contactNumber }}"
+							{% elif memberInformation.contactNumber %}
+							value="{{ memberInformation.contactNumber }}"
+							{% endif -%}>
+				</div>
+			</div>
+		</h4>
+		<!-- Email address -->
+		<h4>
+			<div class="row-fluid">
+				<div class="span3">
+					{{ LanguageResources.const.Email[session['language']] }}
+				</div>
+				<div class="span8">
+					<input class="h5-email input-large" name="emailAddress"
+							type="text" placeholder="kmu@kookmin.ac.kr"
+							{% if emailAddress %}
+							value="{{ emailAddress }}"
+							{%- elif memberInformation.emailAddress %}
+							value="{{ memberInformation.emailAddress }}"
+							{% endif -%}>
+				</div>
+			</div>
+		</h4>
+		<!-- Comment -->
+		<h4>
+			<div class="row-fluid">
+				<div class="span3">
+					{{ LanguageResources.const.Comment[session['language']] }}
+				</div>
+				<div class="span8">
+					<input type="text" class="input-xxlarge" name="comment"
+							placeholder="Short comment"
+							{% if comment %}
+							value="{{ comment }}"
+							{%- elif memberInformation.comment %}
+							value="{{ memberInformation.comment }}"
+							{% endif -%}>
+				</div>
+			</div>
+		</h4>
+		<br>
+		<button class="btn btn-primary" type = "submit" id="confirm">
+			{{ LanguageResources.const.Confirm[session['language']] }}
+		</button>
+	</form>
+</div>
+<style>
+h4{
+	margin-left:20px;
+}
+</style>
+<script>
+/*
+	@@ Validator
+
+	Using h5Validate, it checks validation of password, contact number, email address
+*/
+	// Input Value check
+	jQuery.validator.setDefaults({
+	  debug: false,
+	  success: "valid"
+	});
+	
+	jQuery.validator.addMethod("contactNumber", function (contactNumber, element) {
+        contactNumber = contactNumber.replace(/\s+/g, "");
+        return this.optional(element) || contactNumber.length > 9 &&
+              (contactNumber.match(/^\(?[\d\s]{3}-[\d\s]{3}-[\d\s]{4}$/)
+      				 || contactNumber.match(/^\(?[\d\s]{3}-[\d\s]{4}-[\d\s]{4}$/)
+      				 || contactNumber.match(/^\(?[\d\s]{2}-[\d\s]{3}-[\d\s]{4}$/)
+      				 || contactNumber.match(/^\(?[\d\s]{2}-[\d\s]{4}-[\d\s]{4}$/)) ;
+	}, "{{ LanguageResources().const.FormatCheck[session['language']] }} 010-1234-5678");
+
+	$(function() {
+		$("#infoForm").validate({
+			// Default row define
+			rules: {
+				'password' : {
+					minlength : 4,
+					maxlength : 20
+				},
+				'passwordConfirm': {
+					minlength : 4,
+					maxlength : 20
+					equalTo : "input[name=password]"
+				},
+				'contactNumber' : {
+					contactNumber : true
+				},
+				'emailAddress' : {
+					email : true
+				},
+				'comment' : {
+					maxlength : 100
+				}
+			}
+		}) ;
+		$("#modifyProblemForm").validate() ;
+	}) ;
+
+</script>
+{% endblock -%}

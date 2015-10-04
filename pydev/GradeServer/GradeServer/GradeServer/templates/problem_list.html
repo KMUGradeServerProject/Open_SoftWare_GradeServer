@@ -1,0 +1,207 @@
+<!-- //////////////////////////////////////////
+		fill every "here" sign using jinja2 template
+
+		when you click 'Title', link to its information
+		/////////////////////////////////////////// -->
+
+{%- extends "main.html" -%}
+{%- block body %}
+<div class="container">
+{%- if browserName == 'msie' and browserVersion|length != 4 %}
+	<h2>현재 접속하신 브라우저에서는 문제 제출이 불가합니다.</h2> 
+	<h2>다른 브라우저를 사용하시거나 익스플로러를 업데이트 해주시기 바랍니다.</h2>
+	<h4>익스플로러 업데이트 : <a href="http://windows.microsoft.com/ko-kr/internet-explorer/download-ie">http://windows.microsoft.com/ko-kr/internet-explorer/download-ie</a></h4>
+	<h4>구글 크롬 다운로드 : <a href="https://www.google.com/chrome/browser/desktop/index.html">https://www.google.com/chrome/browser/desktop/index.html</a></h4>
+{%- else %}
+
+	<table class="problem_list table table-bordered">
+		<thead>
+			<tr>
+				<td class="hidden-phone">
+					{{ LanguageResources.const.Number[session['language']] }}
+				<td>
+					{{ LanguageResources.const.ProblemTitle[session['language']] }}
+				<td>
+					{{ LanguageResources.const.Score[session['language']] }}
+				<td class="hidden-phone">
+					{{ LanguageResources.const.Status[session['language']] }}
+				<td>
+					{{ LanguageResources.const.Count[session['language']] }}
+				<td>
+					{{ LanguageResources.const.ProblemRecord[session['language']] }}
+			</tr>
+		<tbody>
+			{% for problemListRecord in problemListRecords %}
+			<tr class='alert {%- if problemListRecord.status == "SOLVED" %} solved
+						      {% elif problemListRecord.status == None %} never_submitted
+						      {% elif problemListRecord.status == "SERVER_ERROR" %} server_error
+				      		{% elif problemListRecord.status == "JUDGING" %} judging
+				      		{% else %} etc_error
+						      {% endif -%}'>
+				<td class="hidden-phone">
+					{{ (pages['count'] - loop.index0) - (pages['pageNum'] - 1) * pages['LIST'] }}
+				<td>
+					<a href="{{ url_for('GradeServer.problem', problemIndex=problemListRecord.problemIndex, pageNum=pages['pageNum']) }}">
+						{%- if problemListRecord.problemName %}{{ problemListRecord.problemName }}{% endif -%}
+					</a>
+				<td>
+					{%- if problemListRecord.score %}{{ problemListRecord.score }}{%- else %}0{% endif -%}
+				<td class="hidden-phone">
+					<div>
+						{%- if problemListRecord.status %}
+							{%- if problemListRecord.status == "WRONG_ANSWER" %}
+								<a href="" data-toggle="modal" data-target="#wrongAnswer{{problemListRecord.problemName}}">
+									{{ LanguageResources().const.WrongAnswer[session['language']] }}
+								</a>
+							{%- elif problemListRecord.status == "COMPILE_ERROR" %}
+								<a href="" data-toggle="modal" data-target="#compileError{{problemListRecord.problemName}}">
+									{{ LanguageResources().const.CompileError[session['language']] }}
+								</a>
+							{% else %}
+								{% if problemListRecord.status == ENUMResources().const.NEVER_SUBMITTED %}
+								{{ LanguageResources().const.NeverSubmitted[session['language']] }}
+								{% elif problemListRecord.status == ENUMResources().const.SOLVED %}
+								{{ LanguageResources().const.Solved[session['language']] }}
+								{% elif problemListRecord.status == ENUMResources().const.TIME_OVER %}
+								{{ LanguageResources().const.TimeOver[session['language']] }}
+								{% elif problemListRecord.status == ENUMResources().const.MEMORY_OVERFLOW %}
+								{{ LanguageResources().const.MemoryOverflow[session['language']] }}
+								{% elif problemListRecord.status == ENUMResources().const.JUDGING %}
+								{{ LanguageResources().const.Judging[session['language']] }}
+								{% elif problemListRecord.status == ENUMResources().const.RUNTIME_ERROR %}
+								{{ LanguageResources().const.RuntimeError[session['language']] }}
+								{% elif problemListRecord.status == ENUMResources().const.SERVER_ERROR %}
+								{{ LanguageResources().const.ServerError[session['language']] }}
+								{% endif %}
+							{%- endif %}
+
+						<!-- Modal -->
+						<div id="compileError{{problemListRecord.problemName}}" class="modal info hide" tabindex="-1" data-focus-on="input:first"
+ 						data-backdrop="static" data-keyboard="false">
+ 							<div class="modal-dialog">
+	  						<div class="modal-content">
+	  							<div class="modal-header">
+    								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    								<h3>컴파일 에러 메시지</h3>
+  								</div>
+  								<div class="modal-body modal-scroll">			
+    									<h4>{{ problemListRecord.compileErrorMessage }}</h4>
+  								</div>
+  								<div class="modal-footer">
+    								<button type="button" data-dismiss="modal" class="btn btn-primary">{{ LanguageResources.const.Close[session['language']] }}</button>
+	  							</div>
+								</div>
+							</div>
+						</div>
+ 						<div id="wrongAnswer{{problemListRecord.problemName}}" class="modal info hide" tabindex="-1" data-focus-on="input:first"
+ 						data-backdrop="static" data-keyboard="false">
+ 							<div class="modal-dialog">
+	  						<div class="modal-content">
+	  							<div class="modal-header">
+    								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    								<h3>오답 메시지</h3>
+  								</div>
+  								<div class="modal-body modal-scroll">			
+    									<p>힌트 사용시 힌트 횟수가 1회 차감됩니다.</p>
+	    								{%- if chanceCount != 0 and isChance == 'TRUE' %}
+	    									<button class="btn btn-danger firstModalClose" data-toggle="modal" href="#HintMessage{{problemListRecord.problemName}}">
+												{{ LanguageResources.const.HintView[session['language']] }}( {{chanceCount}} 
+												{{ LanguageResources.const.HintCount[session['language']] }})</button>
+	    								{%- else %}
+	    									<font color="#ff0000">{{ LanguageResources.const.EmptyHint[session['language']] }}</>
+	    								{%- endif %}
+  								</div>
+  								<div class="modal-footer">
+    								<button type="button" data-dismiss="modal" class="btn btn-primary">{{ LanguageResources.const.Close[session['language']] }}</button>
+	  							</div>
+								</div>
+							</div>
+						</div>
+						<div id="HintMessage{{problemListRecord.problemName}}" class="modal info hide" tabindex="-1" data-focus-on="input:first"
+						data-keyboard="false" data-backdrop="static">
+							<div class="modal-dialog">
+	  						<div class="modal-content">
+		  						<div class="modal-header">
+    								<button type="button" class="close hintClose" data-dismiss="modal" aria-hidden="true">×</button>
+    								<h3>Hint Message</h3>
+  								</div>
+  								<div class="modal-body modal-scroll">
+    								{% for case in get_split_list(wrongTestCaseText[problemListRecord.problemName], '\n') %}
+    									{{ case }} <br> 
+    								{% endfor %}
+  								</div>
+  								<div class="modal-footer">
+    								<button type="button" data-dismiss="modal" class="btn btn-primary hintClose">{{ LanguageResources.const.Close[session['language']] }}</button>
+  								</div>
+								</div>
+      				</div><!-- /.modal-content -->
+    				</div><!-- /.modal-dialog -->
+    				
+						{%- else %}
+							{{ LanguageResources().const.NeverSubmitted[session['language']] }}
+						{% endif -%}
+					</div>
+				<td>
+					{%- if problemListRecord.solutionCheckCount %}{{ problemListRecord.solutionCheckCount }}{%- else %}0{% endif -%}
+				<td>
+					{% if problemListRecord.status %}
+					<a href="{{ url_for('GradeServer.problem_record',
+															status = problemListRecord.status,
+															problemIndex=problemListRecord.problemIndex,
+															sortCondition=LanguageResources().const.SubmissionDate[1]) }}">
+						<div class="hidden-phone">{{ LanguageResources().const.ProblemRecord[session['language']] }}</div>
+						<div class="visible-phone">Record</div>
+					</a>
+				  {% else %}
+				  <a href="{{ url_for('GradeServer.problem_record',
+															status = LanguageResources().const.NeverSubmitted[1],
+															problemIndex=problemListRecord.problemIndex,
+															sortCondition=LanguageResources().const.SubmissionDate[1]) }}">
+						<div class="hidden-phone">{{ LanguageResources().const.ProblemRecord[session['language']] }}</div>
+						<div class="visible-phone">Record</div>
+					</a>
+				  {% endif %}
+					
+			</tr>
+		{% endfor %}
+	</table>
+	
+	<!-- Paging -->
+	<div class="pagination pagination-centered">
+		<ul>
+			{%- if pages['startPage'] > 1 %}
+			<li><a href="{{ url_for ('GradeServer.problem_list', pageNum=pages['pageNum'] - 1) }}"><</a></li>
+			{% endif -%}
+			
+			{%- for i in range (pages['startPage'], pages['endPage'] +1) %}
+			<li>
+				{%- if pages['pageNum'] == i %}
+				<a style ='background-color:gray'>
+				{%- else %}
+				<a href="{{ url_for ('GradeServer.problem_list', pageNum=i) }}">
+				{% endif -%}
+				{{ i }}
+				</a>
+			</li>
+			{% endfor -%}
+			
+			{%- if pages['endPage'] < pages['allPage'] %}
+			<li><a href="{{ url_for ('GradeServer.problem_list', pageNum =pages['pageNum'] + 1) }}">></a></li>
+			{% endif -%}
+		</ul>
+	</div>
+	<!-- End Paging -->
+</div>
+{%- endif %}
+<!-- modal in modal script-->
+<script>
+$(function(){
+	$('.hintClose').click(function() {
+		location.reload();
+	});
+	$('.firstModalClose').click(function() {
+		$('#WrongAnswerMessageModal').modal('hide');
+	});
+});
+</script>
+{% endblock -%}

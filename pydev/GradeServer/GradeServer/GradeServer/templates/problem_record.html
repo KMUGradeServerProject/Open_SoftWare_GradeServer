@@ -1,0 +1,296 @@
+<!-- //////////////////////////////////////////
+		fill every "here" sign using jinja2 template
+		/////////////////////////////////////////// -->
+
+{%- extends "main.html" -%}
+{%- block body %}
+<script>
+// set donut chart graph
+$.getScript('../../static/bootstrap/js/Chart.js',function(){
+	var data = [];
+	var options = {
+		animation: false
+	};
+
+  //Get the context of the canvas element we want to select
+  var c = $('#submitChart');
+  var ct = c.get(0).getContext('2d');
+  var ctx = document.getElementById("submitChart").getContext("2d");
+  // Purple, Black, Dark Blue, Cyan, Pink
+  var colors = new Array("#0c274c", "#ef4089", "#18709c", "#19bdc4", "#fff6ee", "#DD00CC");
+  var highlightColors =new Array('#ff0000', '#ffbb00', '#ffe400', '#1DDB16', '#5F00FF', "#FFFFF") ;
+  /*************************************************************************/
+
+  myNewChart = new Chart(ct).Doughnut(data, options);
+  // input values and colors into the chart
+  // need to change 'value:#' 
+  {% for i in range(0, 6) %}
+  	{% if chartSubmissionRecords[i + 3] %}
+  	myNewChart.addData ({
+  		value: {{ chartSubmissionRecords[i + 3] }},
+  		color: colors[{{ i }}],
+  		label: '{{ chartSubmissionDescriptions[i + 3][session['language']] }}',
+  		highlight: highlightColors[{{ i }}]
+		})
+	{% endif %}
+  {% endfor %}
+});
+</script>
+<div class="container">
+	<div style="text-align:center">
+		<h3>{{ problemInformation.problemName }}</h3>
+		<h4>
+			<div style="row-fluid">
+				<div class="span6" id="time-limit">
+					{{ LanguageResources.const.Limitation[session['language']] }}
+					&nbsp;
+					{{ LanguageResources.const.Time[session['language']] }}
+					&nbsp;:&nbsp;
+					{{ problemInformation.limitedTime }}
+					&nbsp;&nbsp;&nbsp;<span class="hidden-phone">|</span>
+				</div>
+				<div class="span6" id="memory-limit">
+					{{ LanguageResources.const.Limitation[session['language']] }}
+					&nbsp;
+					{{ LanguageResources.const.Memory[session['language']] }}
+					&nbsp;:&nbsp;
+					{{ problemInformation.limitedMemory }}
+				</div>
+			</div>
+		</h4>
+	</div>
+	
+	<div class="row-fluid" style="padding-top:50px">
+		<div class="span4">
+			<!-- chart section -->
+			<div class="row-fluid" style="text-align:center">
+				<div class="spanX">
+					<canvas id="submitChart" width="180px"></canvas>
+				</div>
+				<div class="spanY">
+					<h4>
+						<!--  chartSubmissionRecords is Value, chartSubmissionDescriptions is Description -->
+						<table style="padding-bottom:5px;width:100%">
+						{% for i in range (0, chartSubmissionDescriptions|length) %}
+						<tr>
+							<td style="width:69%">{{ chartSubmissionDescriptions[i][session['language']] }}
+							<td style="width:31%">{% if not chartSubmissionRecords[i] %}0{% else %}{{ chartSubmissionRecords[i] }}{% endif %}
+						</tr>
+						{% endfor %}
+						</table>
+					</h4>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Find Member Id -->
+		<form method="post">
+			<!-- SearchBar // all -->
+			<div class = "span8" style="text-align: center">
+				<div class="input-append" style="margin-bottom: 0px">
+					<input class ="span12" id ="search-members" name ="memberId" type="text" placeholder="Member ID">
+					<button class="btn btn-success" type="submit">
+					<i class="icon-search"></i>
+					</button>
+				</div>
+			</div>
+		</form>
+			
+		<!-- user list section -->	
+		<div class="user_list span8" style="text-align:center">
+		
+			<table class="problem_list table table-bordered">
+				<thead>
+					<tr>
+						<td>
+							{{ LanguageResources.const.Rank[session['language']] }}
+						<td>
+							{{ LanguageResources.const.ID[session['language']] }}
+						<td>
+							<a href = '{{ url_for("GradeServer.problem_record", 
+																		status = status,
+																		problemIndex = problemInformation.problemIndex, 
+																		sortCondition = LanguageResources().const.Runtime[1]) }}'>
+								{{ LanguageResources.const.Runtime[session['language']] }} (ms)
+						<td>
+							<a href = '{{ url_for("GradeServer.problem_record", 
+																		status = status,
+																		problemIndex = problemInformation.problemIndex, 
+																		sortCondition = LanguageResources().const.Memory[1]) }}'>
+								{{ LanguageResources.const.Memory[session['language']] }} (KB)
+						<td>
+							<a href = '{{ url_for("GradeServer.problem_record", 
+																		status = status,
+																		problemIndex = problemInformation.problemIndex, 
+																		sortCondition = LanguageResources().const.FileSize[1]) }}'>
+								{{ LanguageResources.const.FileSize[session['language']] }}(Byte)
+						<td>
+							<a href = '{{ url_for("GradeServer.problem_record", 
+																		status = status,
+																		problemIndex = problemInformation.problemIndex, 
+																		sortCondition = LanguageResources().const.SubmissionDate[1]) }}'>
+								{{ LanguageResources.const.SubmissionDate[session['language']] }}
+						<td>
+							{{ LanguageResources.const.Code[session['language']] }}
+						<td>
+							{{ LanguageResources().const.Like[session['language']] }}
+						<td class="hidden-phone">
+							{{ LanguageResources.const.ViewCount[session['language']] }}
+					</tr>
+				<tbody>
+				{% for problemSolvedMemberRecord in problemSolvedMemberRecords %}
+				<tr {% if memberId == problemSolvedMemberRecord.memberId %}id = "memberId" class = 'label-searchLine'{% endif %}>
+					<td>{{ loop.index }}
+					<td>
+						<a href="{{ url_for('GradeServer.submission_record',
+																memberIdIndex = problemSolvedMemberRecord.memberIdIndex,
+																sortCondition =LanguageResources().const.SubmissionDate[1],
+																pageNum =1) }}">
+							{% if problemSolvedMemberRecord.memberId %}{{ problemSolvedMemberRecord.memberId }}{% endif %}
+						</a>
+					<td>
+						{% if problemSolvedMemberRecord.runTime %}
+						{{ problemSolvedMemberRecord.runTime }}
+						{% else %}
+						0
+						{% endif %}
+					 	ms
+				 	<td>
+						{% if problemSolvedMemberRecord.usedMemory %}
+						{{ problemSolvedMemberRecord.usedMemory }}
+						{% else %}
+						0
+						{% endif %}
+						KB
+					<td>
+						{% if problemSolvedMemberRecord.sumOfSubmittedFileSize %}
+						{{ problemSolvedMemberRecord.sumOfSubmittedFileSize }}
+						{% else %}
+						0
+						{% endif %}
+						<span class="hidden-phone hidden-tablet"> Byte</span>
+						<span class="visible-phone visible-tablet"> B</span>
+					<td>
+						{% if problemSolvedMemberRecord.codeSubmissionDate %}
+						{{ get_datetime_delete_sceond(problemSolvedMemberRecord.codeSubmissionDate) }}
+						{% endif %}
+					<td style ='vertical-align'>
+						{% if SETResources().const.ADMINISTRATOR in session[SessionResources().const.AUTHORITY]
+			           	or problemSolvedMemberRecord.memberIdIndex == session[SessionResources().const.MEMBER_ID_INDEX] %}
+						<a href='{{ url_for("GradeServer.submission_code",
+																status = status,
+																problemIndex = problemInformation.problemIndex,
+																memberIdIndex = problemSolvedMemberRecord.memberIdIndex) }}'>
+							<i class="icon-file"></i>
+							{% if problemSolvedMemberRecord.submissionReplyCount %}
+							[{{ problemSolvedMemberRecord.submissionReplyCount }}]
+							{% endif %}
+						</a>
+						{% endif %}
+					<td class="hidden-phone">
+						<i class = "icon-thumbs-up"></i>
+						{% if problemSolvedMemberRecord.likeCount %}
+						{{ problemSolvedMemberRecord.likeCount }}
+						{% else %}
+						0
+						{% endif %}
+					<td class="hidden-phone">
+						{% if problemSolvedMemberRecord.viewCount %}
+						{{ problemSolvedMemberRecord.viewCount }}
+						{% else %}
+						0
+						{% endif %}
+				</tr>
+				{% endfor %}
+				
+			</table>
+			<!-- Failed Code -->
+			{% if failedProblem %}
+			<hr style="margin-left:5%;margin-right:5%">
+			<table class="problem_list table table-bordered">
+				<thead>
+					<tr>
+						<td>
+							{{ LanguageResources.const.Status[session['language']] }}
+						<td>
+							{{ LanguageResources.const.ID[session['language']] }}
+						<td>
+								{{ LanguageResources.const.Runtime[session['language']] }} (ms)
+						<td>
+								{{ LanguageResources.const.Memory[session['language']] }} (KB)
+						<td>
+								{{ LanguageResources.const.FileSize[session['language']] }}(Byte)
+						<td>
+								{{ LanguageResources.const.SubmissionDate[session['language']] }}
+						<td>
+							{{ LanguageResources.const.Code[session['language']] }}
+				<tbody>
+					<tr class='alert {%- if failedProblem.status == "SOLVED" %} solved
+						      {% elif failedProblem.status == None %} never_submitted
+						      {% elif failedProblem.status == "SERVER_ERROR" %} server_error
+				      		{% elif failedProblem.status == "JUDGING" %} judging
+				      		{% else %} etc_error
+						      {% endif -%}'>
+						<td>
+							{%- if failedProblem.status == "WRONG_ANSWER" %}
+									{{ LanguageResources().const.WrongAnswer[session['language']] }}
+							{%- elif failedProblem.status == "COMPILE_ERROR" %}
+									{{ LanguageResources().const.CompileError[session['language']] }}
+							{% elif failedProblem.status == ENUMResources().const.NEVER_SUBMITTED %}
+								{{ LanguageResources().const.NeverSubmitted[session['language']] }}
+							{% elif failedProblem.status == ENUMResources().const.SOLVED %}
+								{{ LanguageResources().const.Solved[session['language']] }}
+							{% elif failedProblem.status == ENUMResources().const.TIME_OVER %}
+								{{ LanguageResources().const.TimeOver[session['language']] }}
+							{% elif failedProblem.status == ENUMResources().const.MEMORY_OVERFLOW %}
+								{{ LanguageResources().const.MemoryOverflow[session['language']] }}
+							{% elif failedProblem.status == ENUMResources().const.JUDGING %}
+								{{ LanguageResources().const.Judging[session['language']] }}
+							{% elif failedProblem.status == ENUMResources().const.RUNTIME_ERROR %}
+								{{ LanguageResources().const.RuntimeError[session['language']] }}
+							{% elif failedProblem.status == ENUMResources().const.SERVER_ERROR %}
+								{{ LanguageResources().const.ServerError[session['language']] }}
+							{%- endif %}
+						<td>
+							{% if failedProblem.memberId %}
+							{{ failedProblem.memberId }}
+							{% endif %}
+						<td>
+							{% if failedProblem.runTime %}
+							{{ failedProblem.runTime }} ms
+							{% endif %}
+						<td>
+							{% if  failedProblem.usedMemory %}
+							{{ failedProblem.usedMemory }} KB
+							{% endif %}
+						<td>
+							{% if failedProblem.sumOfSubmittedFileSize %}
+							{{ failedProblem.sumOfSubmittedFileSize }} Byte
+							{% endif %}
+						<td>
+							{% if failedProblem.codeSubmissionDate %}
+							{{ failedProblem.codeSubmissionDate }}
+							{% endif %}
+						<td>
+							<a href='{{ url_for("GradeServer.submission_code",
+																	status = status,
+																	problemIndex = failedProblem.problemIndex,
+																	memberIdIndex = failedProblem.memberIdIndex) }}'>
+							<i class="icon-file"></i>
+						</a>
+			{% endif %}
+			</table>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(function(){
+		// Find Member Id
+		var moveScroll = $("#memberId") ;
+		if (moveScroll.attr("id")) 
+			window.scroll(0, moveScroll.offset().top) ;
+	}) ; 
+</script>
+{% endblock -%}
+
