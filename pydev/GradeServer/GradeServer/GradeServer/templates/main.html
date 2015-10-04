@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>Kookmin University Grade Server </title>
+
+	<link href="../../static/bootstrap/css/bootstrap.css" rel="stylesheet">
+	<link href="../../static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+	<link href="../../static/bootstrap/css/userdefine.css" rel="stylesheet">
+	<link href="../../static/bootstrap/css/dropzone.css" rel="stylesheet">
+	<link href="../../static/bootstrap/css/jquery-ui.css" rel="stylesheet">
+	<link href="../../static/bootstrap/css/jquery-ui.structure.css" rel="stylesheet">
+	<link href="../../static/bootstrap/themes/smoothness/jquery-ui.css" rel="stylesheet">
+
+	<script src="../../static/bootstrap/js/jquery.js"></script>
+	<script src="../../static/bootstrap/js/jquery-ui-1.10.1.min.js"></script>
+	<script src="../../static/bootstrap/js/jquery.autocomplete.js"></script>
+	<script src="../../static/bootstrap/js/src/ace.js" charset="utf-8"></script>
+	<script src="../../static/bootstrap/js/spin.min.js"></script>
+	<!-- Time Picker -->
+	<link href="../../static/bootstrap/css/jquery.simple-dtpicker.css" rel="stylesheet">
+	<script src="../../static/bootstrap/js/jquery.simple-dtpicker.js"></script>
+	
+	<!-- Form Validation -->
+	<link href="../../static/bootstrap/css/site-demos.css" rel="stylesheet">
+	<script src="../../static/bootstrap/js/jquery.validate.js"></script>
+	<script src="../../static/bootstrap/js/additional-methods.js"></script>
+	<script src="../../static/bootstrap/js/messages_ko.js"></script>
+
+	<meta name="viewport" content="width=device-width, idnitial-scale=1.0"> <!-- responsible design -->
+	<link rel="shortcut icon" href="../../static/bootstrap/img/kookmin_logo_white.jpg"> 
+</head>
+<!--
+@@ Main page
+
+When you use 'LanguageResources' in main, you need to check session['language'] first
+Because showing language is up to session['language'] value
+So If you use 'LanguageResources' in this page without session checking, it will display empty
+-->
+<body onload="checkMain()">
+	<!-- 
+	@@ Navigation bar 
+	-->
+	
+	<!-- Set Resources... -->
+	{% set SETResources = SETResources() %}
+	{% set SessionResources = SessionResources() %}
+	{% set LanguageResources = LanguageResources() %}
+	{#
+	{% set ENUMResources = ENUMResources() %}
+	{% set OtherResources = OtherResources() %}
+	{% set MessageResources = MessageResources() %}
+	{% set RouteResources = RouteResources() %}
+	{% set HTMLResources = HTMLResources() %}
+	#}	
+	<div id='spin'></div>
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container">
+				<!-- Buttons for small size of window -->
+				<button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>	
+					<span class="icon-bar"></span>
+				</button>
+				
+				<!-- Link to main with KMU Logo -->
+				<a class="link-main" href="{{ url_for('GradeServer.sign_in') }}" style="width:250px">
+					<img src="../../static/bootstrap/img/kookmin_logo_dark.jpg" style="height:40px;width:40px">
+					KMU Grade Server
+				</a>
+
+				<div class="nav-collapse collapse" >
+					<ul class="nav">
+						<li>
+							<a href="{{ url_for('GradeServer.problem_list', pageNum=1) }}">
+								{%- if session['language'] %}	{{ LanguageResources.const.Problems[session['language']] }}
+								{%- else %}{{ LanguageResources.const.Problems[0] }} <!-- default -->
+								{% endif -%}
+							</a>
+						<li>
+							<a href="{{ url_for('GradeServer.rank', sortCondition=LanguageResources().const.Rate[1], pageNum=1) }}">
+								{%- if session['language'] %}	{{ LanguageResources.const.Rank[session['language']] }}
+								{%- else %}{{ LanguageResources.const.Rank[0] }} <!-- default -->
+								{% endif -%}
+							</a>
+						</li>
+						<li>
+							<a href="{{ url_for('GradeServer.article_board',
+																	filterCondition = ' ',
+																	keyWord =  ' ',
+																	pageNum=1) }}">
+								{%- if session['language'] %}	{{ LanguageResources.const.Board[session['language']] }}
+								{%- else %}{{ LanguageResources.const.Board[0] }} <!-- default -->
+								{% endif -%}
+							</a>
+						</li>
+						
+						<!--
+						@@ Section up to state of signing
+						-->
+						{%- if session['memberId'] != NULL %}
+						<li class="dropdown">
+							<a class="dropdown-toggle" href="#" data-toggle="dropdown">
+								{{ session['memberId'] }}<b class="caret"></b>
+							</a>
+							<ul class="dropdown-menu">
+								<!--
+								@@ Menus up to authority
+								-->
+								{% if SETResources.const.USER in session['authority'] %}
+								<li>
+									<a href="{{ url_for ('GradeServer.submission_record',
+																	 		 memberIdIndex = session['memberIdIndex'],
+																	 		 sortCondition = LanguageResources().const.SubmissionDate[1],
+																	 		 pageNum=1) }}">
+										{{ LanguageResources().const.UserRecord[session['language']] }}
+									</a>
+								</li>
+								{% endif %}
+								<li>
+									<a class="main-checker"
+										href="{{ url_for('GradeServer.id_check', select='account') }}">
+										{{ LanguageResources.const.Account[session['language']] }}
+									</a>
+								</li>
+								<li>
+									<a class="main-checker"
+										href="{{ url_for('GradeServer.article_notice',
+																		 filterCondition = ' ',
+																		 keyWord = ' ',
+																		 pageNum=1) }}">
+										{{ LanguageResources.const.Notice[session['language']] }}
+									</a>
+								</li> <!-- same with board, the difference is db-query for contents -->
+								<li>
+									<a class="main-checker" href="{{ url_for('GradeServer.admin_manual_page') }}">
+										{{ LanguageResources.const.Help[session['language']] }}
+									</a>
+								</li>
+								{%- if SETResources.const.ADMINISTRATOR in session['authority'] %}
+								<li class="dropdown-submenu">
+									<a class="dropdown-toggle main-checker"
+										id="server-management"
+										data-toggle="dropdown">
+										{{ LanguageResources.const.Management[session['language']] }}
+									</a>
+									<ul class="dropdown-menu" id="menu-box">
+										<li>
+											<a class="main-checker" id='manage-problem'
+												href="{{ url_for('GradeServer.id_check', select='manage_problem') }}">
+												{{ LanguageResources.const.Problem[session['language']] }}
+												{{ LanguageResources().const.Management[session['language']] }}
+											</a>
+										</li>
+										<li>
+											<a class="main-checker" id='manage-user'
+												href="{{ url_for('GradeServer.id_check', select='manage_user') }}">
+												{{ LanguageResources.const.User[session['language']] }}
+												{{ LanguageResources().const.Management[session['language']] }}
+											</a>
+										</li>
+									</ul>
+								</li>
+								{% endif -%}
+								<li>
+									<a class="main-checker"
+										href="{{ url_for('GradeServer.sign_out') }}">
+										{{ LanguageResources.const.SignOut[session['language']] }}
+									</a>
+								</li>
+							</ul>
+						</li>
+						<!--
+						@@ Alert Icon
+						
+						It will show alert lists
+						Doesn't implement yet, so keeps hidden
+						-->
+						<li style="display:none">
+							<a href="#">
+								<i class="icon-bell icon-white"></i>
+							</a>
+						</li>
+
+						{%- else %}
+						<li class="dropdown">
+							<a class="dropdown-toggle" href="#" data-toggle="dropdown">
+								{%- if session['language'] %}	{{ LanguageResources.const.SignIn[session['language']] }}
+								{%- else %}{{ LanguageResources.const.SignIn[0] }} <!-- default -->
+								{% endif -%} <b class="caret"></b>
+							</a>
+							<ul class="dropdown-menu span4">
+								<form class="sign-in" method="post" action='{{ url_for("GradeServer.sign_in") }}'>
+									<div style="text-align:left">
+										<input class="span2" id="id" name="memberId" type="text"
+												placeholder="ID" autocomplete="off" autofocus="autofocus" style="display:inline">
+												
+										<input class="span2" id="pw" name="password" type="password"
+												placeholder="Password" style="display:inline">
+												
+										<button class="btn" id="submit" type="submit" style="display:inline">
+											{%- if session['language'] %}	{{ LanguageResources.const.Confirm[session['language']] }}
+											{%- else %}{{ LanguageResources.const.Confirm[0] }} <!-- default -->
+											{% endif -%}
+										</button>
+									</div>
+								</form>
+							</ul>
+						</li>
+						{% endif -%}
+					</ul>
+					<!--
+					@@ Sign up button
+					
+					Members will be registered by administrator.
+					It can be showing up if you allow users sign up into this service by themselves.
+
+					Currently users should be registered by adminitrators, so its state is hidden.
+					-->
+					{%- if not session %}
+					<a class="btn pull-right hide" href="{{ url_for('GradeServer.sign_in') }}"
+						style="margin:15px 5px 10px 0px">
+						{%- if session['language'] %}	{{ LanguageResources.const.SignUp[session['language']] }}
+						{%- else %}{{ LanguageResources.const.SignUp[0] }} <!-- default -->
+						{% endif -%}
+					</a>
+					{% endif -%}
+
+					<!--
+					@@ Language select 
+					-->
+					{%- if session['memberId'] != NULL %}
+					<a class="pull-right languageButton" id="language_en" onclick="applyLanguage('en')" style="display:none">
+						<div style="background-color:transparent;background-image:url(../../static/bootstrap/img/flags.png);background-position: -416px -420px;height:24px;width:32px"></div>
+					</a>
+					<a class="pull-right languageButton" id="language_kr" onclick="applyLanguage('kr')" style="display:none">
+						<div style="background-image:url(../../static/bootstrap/img/flags.png);background-position: -160px -228px;height:24px;width:32px"></div>
+					</a>
+					<form id="language" method="post">
+						<input id="languageInfo" name="language" style="display:none">
+					</form>
+					
+					<style>
+					.languageButton{
+						margin: 10px 5px 10px 0px;
+						display: inline-block;
+					}
+					.languageButton>img{
+						display: block;
+					}
+					</style>
+					{% endif -%}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- ///////////////////////////////////
+		container section
+	//////////////////////////////////// -->
+	<!-- ///// body section ///// -->
+	<div class="body">
+		<!-- 
+		@@ Flash message
+	
+		This will display success message of works.
+		-->
+		{%- with flashes=get_flashed_messages() %}
+		{%- if flashes %}
+		<div class="container">
+			<div class="alert alert-info">
+				{%- for message in flashes %}
+				{{ message }}
+				{% endfor -%}
+			</div>
+		</div>
+		{% endif -%}
+		{% endwith -%}
+
+		<!--
+		@@ Error message
+
+		This will display error message of works.
+		Usually shows from 'return' command in python.
+		-->
+		{%- if error %}
+		<div class="container">
+			<div class="error alert alert-error" id="errorAlert"
+				  style="width:100%;padding-right:0px;margin-bottom:0px">
+				{% if session['language'] %}{{ error[session['language']] }}
+				{% else %}{{ error[0] }}
+				{% endif %}
+			</div>
+		</div>
+		{% endif -%}
+		
+		{%- block body %}
+		<div class="container" style="text-align:center">
+			<h2>
+				<p class="hidden-phone">Kookmin University Online Judge System</p>
+				<p class="visible-phone">Kookmin University<br>Online Judge System</p>
+			</h2>
+		</div>
+		<div class="container">
+			<!--
+			@@ Carousel section
+			-->
+			<div class="carousel slide" id="myCarousel"
+				  style="width:100%" data-ride="carousel">
+				<div class="carousel-inner">
+					{%- for noticeRecord in noticeRecords %}
+					{% if loop.index0 == 0 %}
+					<div class='item active'>
+					{% else %}
+					<div class='item'>
+					{% endif %}
+						<a href="{{ url_for ('GradeServer.read',
+																 articleIndex=noticeRecord.articleIndex) }}">
+							<div class="carousel-span" style="background:#f0f0f0;height:100%;text-align:center;padding:3px;border:2px solid white">
+								<h3>
+									{% if noticeRecord.articleType
+									      and noticeRecord.articleType == ENUMResources().const.NOTICE %}
+							      {%- if session['language'] %}
+											{{ LanguageResources.const.Notice[session['language']] }}
+										{%- else %}
+											{{ LanguageResources.const.Notice[0] }}<!-- default -->
+										{% endif -%}
+										<br><br>
+									{% endif -%}
+								</h3>
+								<h3>
+									<!-- 
+									@@ Make title shortcut
+									-->
+									<script> 
+									// if title is longer than 25 charater, change it to short
+									var title = "{{ noticeRecord.title }}"; 
+									if(title.length >= {{ OtherResources().const.LIMIT_TITLE_VIEW_LENGTH }}) {
+										title = title.substring(0, {{ OtherResources().const.TITLE_VIEW_LENGTH }}) + "...";
+									}
+									document.write(title);
+									</script>
+									
+									{% if noticeRecord.replyCount %}[{{ noticeRecord.replyCount }}]{% endif %}
+								</h3>
+							</div>
+						</a>
+					</div>
+					{% endfor -%}
+				</div>
+				<!--
+				@@ Carousel indicators
+				-->
+				<ol class="carousel-indicators" id="carousel-indicator">
+					{%- for noticeRecord in noticeRecords %}
+					{% if loop.index0==0 %} 
+					<li class='active' data-target='#myCarousel' data-slide-to='{{ loop.index0 }}'></li>
+					{% else %}
+					<li data-target='#myCarousel' data-slide-to='{{ loop.index0 }}'></li>
+					{% endif %}
+					{% endfor -%}
+				</ol>
+				<a class="left carousel-control" href="#myCarousel" data-slide="prev">&lsaquo;</a>
+				<a class="right carousel-control" href="#myCarousel" data-slide="next">&rsaquo;</a>
+			</div>
+			<br><br>
+			<!--
+			@@ Partitions under carousel
+			-->
+			<div class="container">
+				<div class="row-fluid">
+				
+					<!-- TopCoders -->
+					<div class="span4 topcoder">
+						<h4>
+							{%- if session['language'] %}	{{ LanguageResources.const.TopCoder[session['language']] }}
+							{%- else %}{{ LanguageResources.const.TopCoder[0] }}<!-- default -->
+							{% endif -%}
+						</h4>
+						{% for topCoder in topCoders %}
+							<a href="{{ url_for ('GradeServer.submission_record',
+																	 memberIdIndex = topCoder.memberIdIndex,
+																	 sortCondition = LanguageResources().const.SubmissionDate[1],
+																	 pageNum=1) }}">
+								{{ topCoder.memberId }}
+							</a>
+						{% endfor %}
+					</div>
+					
+					<div class="span4 manual">
+						<h4>
+							{%- if session['language'] %}	
+								<a href="{{ url_for('GradeServer.manual_page') }}">
+									{{ LanguageResources.const.Help[session['language']] }}
+								</a>
+							{%- else %}
+								<a href="{{ url_for('GradeServer.manual_page') }}">
+									{{ LanguageResources.const.Help[0] }}
+								</a><!-- default -->
+							{% endif -%}
+						</h4>
+					</div>
+
+					<style>
+					.span4{
+						text-align: center;
+						background: #eeeeee;
+					}
+					</style>
+				</div>
+			</div>
+			{% endblock -%}
+		</div>
+		<!-- ///// end body section ///// -->
+
+		<!-- footer -->
+		<div class="fluid-footer" style="background-color: #ffffff"> Algorithmic Engineering Lab </div>
+
+		<script>
+		// scrollable dropdown menu
+		$(".scrollable-menu").css("max-height", $(window).height()-100);
+		$(function(){	// acceptable up to window size
+			$(window).resize(function(){
+				$(".scrollable-menu").css("max-height", $(window).height()-100);
+			});
+		});
+
+		function applyLanguage(language){
+			document.getElementById("languageInfo").value = language;
+			document.getElementById("language").submit();
+		}
+
+		/*
+		@@ Position of carousel-indicator
+		*/
+		var numOfItems = $("#carousel-indicator li").length;
+		var carouselWidth = 49 + numOfItems/2;
+		document.getElementById("carousel-indicator").style.width= carouselWidth+"%";
+
+		/*
+		@@ Check if current page is 'main.html'
+
+		If current page is 'main.html' then shows language selection button
+		else, hide it.
+		*/
+		function checkMain(){
+			var URL = document.URL;
+			if(URL.split('/')[3] != ''){
+				document.getElementById("language_en").style.display="none";
+				document.getElementById("language_kr").style.display="none";
+			}
+			else{
+				document.getElementById("language_en").style.display="inline-block";
+				document.getElementById("language_kr").style.display="inline-block";
+			}
+		}
+		</script>
+
+		<script src="../../static/bootstrap/js/bootstrap.js"></script>
+		<script src="../../static/bootstrap/js/dropzone.js"></script>
+		<script src="../../static/bootstrap/js/userdefine.js"></script>
+		<script src="../../static/bootstrap/js/dropzone-define.js"></script>
+		<script src="../../static/bootstrap/js/Chart.js"></script>
+		
+	</body>
+	</html>

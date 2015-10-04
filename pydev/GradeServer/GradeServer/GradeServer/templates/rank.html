@@ -1,0 +1,151 @@
+<!-- //////////////////////////////////////////
+		fill every "here" sign using jinja2 template
+		/////////////////////////////////////////// -->
+
+{%- extends "main.html" -%}
+{%- block body %}
+<script>
+$(function() {
+	var members = [
+		{% for member in memberRecords %}
+			{ value: "{% if member.memberId %}{{ member.memberId }}{% endif %}" },
+		{% endfor %}
+		{ value: ""}
+	];
+	$("#search-members").autocomplete({
+		lookup: members,
+		onSelect: function(suggestion){
+    }
+	});
+});
+</script>
+
+<div class="container">
+	<h2>
+		{{ LanguageResources.const.Ranking[session['language']] }}
+	</h2>
+	
+	<table class="table">
+		<thead>
+			<tr>
+				<td>
+					{{ LanguageResources.const.Rank[session['language']] }}
+				<td>
+					{{ LanguageResources.const.User[session['language']] }} {{ LanguageResources.const.ID[session['language']] }}
+				<td>
+					{{ LanguageResources.const.Comment[session['language']] }}
+				<td>
+					{{ LanguageResources.const.Tries[session['language']] }}
+				<td>
+					<a href="{{ url_for('GradeServer.rank',
+						 									sortCondition = LanguageResources().const.SolvedProblems[1],
+						 									pageNum = pages['pageNum']) }}">
+						{{ LanguageResources.const.SolvedProblems[session['language']] }}
+					</a>
+				<td>
+					<a href="{{ url_for('GradeServer.rank',
+															sortCondition =LanguageResources().const.Rate[1],
+															pageNum = pages['pageNum']) }}">
+						{{ LanguageResources.const.Rate[session['language']] }}
+					</a>
+		<tbody>
+			{%- for rankMemberRecord in rankMemberRecords %}
+			<tr {% if memberId == rankMemberRecord.memberId %}id  = "memberId" class = 'label-searchLine'{% endif %}>
+				<td>
+				<!-- Same Rank -->
+				{% if sortCondition == 'solvedProblem' %}
+					{% if loop.index0 > 0
+								and rankMemberRecords[loop.index0 -1].sumOfSolvedProblemCount == rankMemberRecord.sumOfSolvedProblemCount %}
+						{% if rankNumer %}{% set rankNumber = loop.index0 + (pages['pageNum'] - 1) * pages['LIST'] %}{% endif %}
+					{% else %}
+						{% set rankNumber = loop.index + (pages['pageNum'] - 1) * pages['LIST'] %}
+					{% endif %}
+				{% else %}
+					{% if loop.index0 > 0
+								and rankMemberRecords[loop.index0 -1].solvedRate == rankMemberRecord.solvedRate %}
+						{% if rankNumer %}{% set rankNumber = loop.index0 + (pages['pageNum'] - 1) * pages['LIST'] %}{% endif %}
+					{% else %}
+						{% set rankNumber = loop.index + (pages['pageNum'] - 1) * pages['LIST'] %}
+					{% endif %}
+				{% endif %}
+					{{ rankNumber }}
+				<td>
+					<a href="{{ url_for('GradeServer.submission_record',
+															memberIdIndex = rankMemberRecord.memberIdIndex,
+															sortCondition = LanguageResources().const.SubmissionDate[1],
+															pageNum = 1) }}">
+						{% if rankMemberRecord.memberId %}{{ rankMemberRecord.memberId }}{% endif %}
+					</a>
+				<td>
+					{%- if rankMemberRecord.comment %}
+					<script> 
+						// if title is longer than 25 charater, change it to short
+						var comment = "{{ rankMemberRecord.comment }}"; 
+						if(comment.length >= {{ OtherResources().const.LIMIT_TITLE_VIEW_LENGTH }}){
+							comment = comment.substring(0, {{ OtherResources().const.TITLE_VIEW_LENGTH }}) + "...";
+						}
+						document.write(comment);
+					</script>
+					{% endif -%}
+				<td>{% if rankMemberRecord.solutionCheckCount %}{{ rankMemberRecord.solutionCheckCount }}{% endif %}
+				<td>{% if rankMemberRecord.sumOfSolvedProblemCount %}{{ rankMemberRecord.sumOfSolvedProblemCount }}{% endif %}
+				
+				<td>{% if rankMemberRecord.solvedRate %}{{ rankMemberRecord.solvedRate }}%{% endif %}
+			</tr>
+			{% endfor -%}
+	</table>
+	<!-- page number section -->
+	<div class="pagination pagination-centered">
+		<ul>
+			{%- if pages['pageNum'] > pages['BLOCK'] %}
+			<li>
+				<a href="{{ url_for ('GradeServer.rank',
+														 sortCondition = sortCondition,
+														 pageNum =pages['pageNum'] - 1) }}"><</a>
+			{% endif -%}
+			
+			{%- for i in range (pages['startPage'], pages['endPage'] +1) %}
+			<li>
+				{%- if pages['pageNum'] == i %}
+				<a style ='background-color:gray'>
+				{%- else %}
+				<a href="{{ url_for ('GradeServer.rank',
+														 sortCondition = sortCondition,
+														 pageNum = i) }}">
+				{% endif -%}
+					{{ i }}
+				</a>
+			{% endfor -%}
+			
+			{%- if pages['endPage'] < pages ['allPage'] %}
+			<li>
+				<a href="{{ url_for ('GradeServer.rank',
+														 sortCondition = sortCondition,
+														 pageNum =pages['pageNum'] + 1) }}">></a>
+			{% endif -%}
+	</div>
+				
+	<!-- Find Member Id -->
+	<form method="post">
+		<!-- SearchBar // all -->
+		<div id="all" class="tab-pane active" style="text-align: center">
+			<div class="input-append" style="margin-bottom: 0px">
+				<input class ="span3" id ="search-members" name ="memberId" type="text" placeholder="Member ID">
+				<button class="btn btn-success" type="submit">
+				<i class="icon-search"></i>
+				</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+<script>
+	$(function(){
+		// Find Member Id
+		var moveScroll = $("#memberId") ;
+		if (moveScroll.attr("id")) 
+			window.scroll(0, moveScroll.offset().top) ;
+	}) ; 
+</script>
+<script src="../../static/bootstrap/js/userdefine-tabs.js"></script>
+{% endblock -%}

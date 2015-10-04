@@ -1,0 +1,467 @@
+<!-- 
+	@@ manage_user.html
+
+	The page when server administrator manages college and department.
+	author: seulgi choi & uijae lee
+-->
+
+{%- extends "main.html" -%}
+{%- block body %}
+<script>
+	function filterConditions (viewStr, nameStr){
+                 	
+		var dropDownCondition = document.getElementById("dropDownCondition") ;
+		dropDownCondition.innerHTML = viewStr + "<b class = 'caret'></b>" ;
+		
+		var filterCondition = document.getElementById("filterCondition") ;
+		filterCondition.name = nameStr ;
+     }
+</script>
+
+<div class="container">
+	<h3>
+		{{ LanguageResources.const.User[session['language']] }}
+		{{ LanguageResources.const.Management[session['language']] }}
+	</h3>
+	<!-- Member Insert -->
+	<form id = "insertUserForm" method="post">
+		<div class="modal hide fade span12" id="memberInsertModal"
+			   role="dialog" tabindex="-1">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal" type="button"
+						  	aria-hidden="true">
+			  	x
+		  	</button>
+				<h3 id="modifyModalLabel">
+					{{ LanguageResources.const.User[session['language']] }}
+					{{ LanguageResources.const.Addition[session['language']] }}
+				</h3>
+			</div>
+			
+			<div class="modal-body">
+				<p></p>
+				<!-- Addline button -->
+				<div style="text-align:right">
+					<button class="btn btn-info" type="button" onClick = "addlineMember('', '', '')">
+						{{ LanguageResources.const.AddLine[session['language']] }}
+					</button>
+				</div>
+				
+				<div>			
+					<p>
+					<div style="width:120px;display:inline-block;text-align:center;margin-left:-1px">
+					File(*.txt, *.csv)
+					</div>
+					<input type="file" name="files" multiple onchange = "readFiles(this)">
+				</div>
+				<table class="table table-bordered" id = "newRegisteredMembers" style = "margin-top:10px">
+					<thead>
+						<tr>
+							<td>
+								{{ LanguageResources.const.DetailInformation[session['language']] }}
+							<td>
+								{{ LanguageResources.const.ID[session['language']] }}
+							<td>
+								{{ LanguageResources.const.Name[session['language']] }}
+							<td>
+								&nbsp;
+					<tbody id = "insertMemberTableBody">
+				</table>
+			</div>
+			
+			<div class="modal-footer">
+				<button class="btn" data-dismiss="modal" aria-hidden="true">
+					{{ LanguageResources.const.Close[session['language']] }}
+				</button>
+				<button class="btn btn-success" type ="submit" id = "memberInsert" name ="memberInsert0" onClick = "validateEmptyCheck(this.form, 'insertProblemTableBody')">
+					{{ LanguageResources.const.Confirm[session['language']] }}
+				</button>
+			</div>
+		</div>
+	</form>	
+	<form method="post">
+	<!-- Member deletion -->
+	<div class="modal hide fade" id="deleteModal"
+		  aria-hidden="true" aria-labelledby="deleteModalLabel"
+		  role="dialog" tabindex="-1">
+		<div class="modal-header">
+			<button class="close" data-dismiss="modal" type="button"
+					  aria-hidden="true">
+			  	x
+		  	</button>
+			<h3 id="deleteModalLabel">
+				{{ LanguageResources.const.Problem[session['language']] }}
+				{{ LanguageResources.const.Deletion[session['language']] }}
+			</h3>
+		</div>
+		<div class="modal-body">
+			<p>{{ LanguageResources.const.ReallyDeletion[session['language']] }}</p>
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">
+				{{ LanguageResources.const.Close[session['language']] }}
+			</button>
+			<button class="btn btn-danger" type="submit" name ="memberDeleted">
+				{{ LanguageResources.const.Confirm[session['language']] }}
+			</button>
+			<!-- In IE, it doesn't send its form values to server if 'form tags' are out of '<form></form>'  -->
+		</div>
+	</div>
+
+	<!-- No items choosed when deletion button's clicked -->
+	<div class="modal hide fade" id="deleteNoItem" 
+		  aria-labelledby="deleteModalLabel" aria-hidden="true"
+		  role="dialog" tabindex="-1" style="width:200px">
+		<div class="modal-header">
+			<button class="close" data-dismiss="modal" type="button"
+					  aria-hidden="true">
+			  	x
+		  	</button>
+			<h3 id="deleteModalLabel">
+				{{ LanguageResources.const.User[session['language']] }}
+				{{ LanguageResources.const.Deletion[session['language']] }}
+			</h3>
+		</div>
+		<div class="modal-body">
+			<p>{{ LanguageResources.const.NoSelect[session['language']] }}</p>
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">
+				{{ LanguageResources.const.Close[session['language']] }}
+			</button>
+		</div>
+	</div>
+	<!-- Buttons to modify, add and delete problem -->
+	<div style="text-align:right">
+		<a class="btn btn-success" data-toggle="modal" role="button" href = "#memberInsertModal">
+			{{ LanguageResources.const.Addition[session['language']] }} <i class = "icon-user"></i>
+		</a>
+		<a class="btn btn-danger" data-toggle="modal" role="button"
+			onclick="showingDeleteModal()">
+			{{ LanguageResources.const.Deletion[session['language']] }} <i class = "icon-trash"></i>
+		</a>
+	</div>
+				<table class="table" id="registeredMembers" style="margin-top:10px">
+					<thead>
+						<tr>
+							<td>
+								<a href = '{{ url_for ("GradeServer.manage_user",
+																			  sortCondition = LanguageResources().const.ID[1],
+																			  filterCondition = filterCondition,
+														 						keyWord = keyWord,
+																			  pageNum = pages['pageNum']) }}'>
+									{{ LanguageResources().const.ID[session['language']] }}
+								</a>
+							<td>
+								<a href = '{{ url_for ("GradeServer.manage_user",
+																			  sortCondition = LanguageResources().const.Name[1],
+																			  filterCondition = filterCondition,
+														 						keyWord = keyWord,
+																			  pageNum = pages['pageNum']) }}'>
+									{{ LanguageResources().const.Name[session['language']] }}
+								</a>
+							<td>
+								{{ LanguageResources().const.Email[session['language']] }}
+							<td>
+								{{ LanguageResources().const.ContactNumber[session['language']] }}
+							<td>
+								<a href = '{{ url_for ("GradeServer.manage_user",
+																			  sortCondition = LanguageResources().const.LastAccess[1],
+																			  filterCondition = filterCondition,
+														 						keyWord = keyWord,
+																			  pageNum = pages['pageNum']) }}'>
+									{{ LanguageResources().const.LastAccess[session['language']] }}
+								</a>
+							<td>
+								{{ LanguageResources.const.Check[session['language']] }}
+								<input class="checkAll" type="checkbox" style="margin:0px"
+										onclick="selectAllCheckboxes('registeredMembers');">
+						</tr>
+					<tbody>
+					<!-- Members -->
+					{% for memberRecord in memberRecords %}
+						<tr>
+							<td>
+								{% if memberRecord.memberId %}
+								{{ memberRecord.memberId }}
+								{% endif %}
+							<td>
+								{% if memberRecord.memberName %}
+								{{ memberRecord.memberName }}
+								{% endif %}
+							<td>
+								{% if memberRecord.emailAddress %}
+								{{ memberRecord.emailAddress }}
+								{% endif %}
+							<td>
+								{% if memberRecord.contactNumber %}
+								{{ memberRecord.contactNumber }}
+								{% endif %}
+							<td>
+								{% if memberRecord.lastAccessDate %}
+								{{ memberRecord.lastAccessDate }}
+								{% endif %}
+							<td>
+								<label class="checkbox-center">
+									<input class="box-check" name="{{ memberRecord.organizationIndex }} {{ memberRecord.memberIdIndex }}"
+											type="checkbox" value="{{ memberRecord.organizationIndex }} {{ memberRecord.memberIdIndex }}">
+								</label>
+					{% endfor %}
+					</tbody>
+				</table>
+				
+				<!-- Paging -->
+				<div class="pagination pagination-centered">
+					<ul>
+						{%- if pages['startPage'] > 1 %}
+						<li>
+							<a href = '{{ url_for ("GradeServer.manage_user",
+																		 sortCondition = sortCondition,
+																		 filterCondition = filterCondition,
+													 					 keyWord = keyWord,
+																		 pageNum = pages['pageNum'] -1) }}'>
+								<
+							</a>
+						</li>
+						{% endif -%}
+						
+						{%- for i in range (pages['startPage'], pages['endPage'] +1) %}
+						<li>
+							{% if pages['pageNum'] == i %}
+							<a style ='background-color:gray'>
+							{% else %}
+							<a href = '{{ url_for ("GradeServer.manage_user",
+																		 sortCondition = sortCondition,
+																		 filterCondition = filterCondition,
+														 				 keyWord = keyWord,
+																		 pageNum = i) }}'>
+							{% endif %}
+							{{ i }}
+							</a>
+						</li>
+						{% endfor -%}
+						
+						{%- if pages['endPage'] < pages['allPage'] %}
+						<li>
+							<a href = '{{ url_for ("GradeServer.manage_user",
+																		 sortCondition = sortCondition,
+																		 filterCondition = filterCondition,
+												 						 keyWord = keyWord,
+																		 pageNum = pages['pageNum'] +1) }}'>
+								>
+							</a>
+						</li>
+						{% endif -%}
+					</ul>
+				</div>
+	<!-- search bar -->
+	<form method ="post">
+		<!-- SearchBar // all -->
+		<div style="text-align:center">
+			
+			<div class="btn-group">
+				<a class="btn btn-info dropdown-toggle" data-toggle="dropdown" id = 'dropDownCondition'>{{ LanguageResources().const.All[session['language']] }}<span class="caret"></span></a>
+				<ul class="dropdown-menu">
+					{% for filter in Filters %}
+					<li>
+						<a onclick = 'filterConditions("{{ filter[0] }}", "{{ filter[1] }}")'>
+							{{ filter[session['language']] }}
+						</a>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+
+			<div class="input-append" style="margin-bottom:0px">
+				<input class="span3" name = 'keyWord' type="text" placeholder="Type Keyword">
+				<button class="btn btn-success" id = 'filterCondition' name = '{{ Filters[0][1] }}'
+						  type="submit">
+				  	<i class="icon-search"></i>
+			  	</button>
+			</div>
+		</div>
+	</form>
+	<!-- end search bar -->
+</div>
+<script>
+$(function(){
+	// modal position re-place event for initial
+	placeModalCenter("memberInsertModal");
+	placeModalCenter("deleteModal");
+	placeModalCenter("deleteNoItem");
+	$(window).resize(function(){
+		// when resize the window size
+		placeModalCenter("memberInsertModal");
+		placeModalCenter("deleteModal");
+		placeModalCenter("deleteNoItem");
+	});
+});
+
+function filterConditions (viewStr, nameStr){	
+	var dropDownCondition = document.getElementById("dropDownCondition") ;
+	dropDownCondition.innerHTML = viewStr + "<b class = 'caret'></b>" ;
+
+	var filterCondition = document.getElementById("filterCondition") ;
+	filterCondition.name = nameStr ;
+}
+
+function addlineMember (detailInformation, memberId, memberName) {
+	// Get Table Body
+	var tableBody = document.getElementById ("insertMemberTableBody") ;
+	
+	// Get Table Body next row
+	var row = tableBody.rows.length + 1 ;
+	
+	// confirm button modify name
+	document.getElementById ("memberInsert").name = "memberInsert" + row ;
+	
+	// Create new tr
+	var newTR = document.createElement ("tr") ;
+	newTR.id = "insertMemberTableBodyRow" + row ;
+	// Set <tr>
+	newTR.innerHTML = 
+								"<td>" +
+									"<input class='span2' name='detailInformation" + row + "' type='text'" +
+												 "placeholder = 'Detail Information' autocomplete='off' style = 'text-align:center'>" +
+							 	"<td>" +
+									"<input class='span2' name='memberId" + row + "' type='text'" +
+												 "placeholder = 'Member Id' autocomplete='off' style = 'text-align:center'>" +
+								"<td>" +
+									"<input class='span2' name='memberName" + row + "' type='text'" +
+												 "placeholder = 'Member Name' autocomplete='off' style = 'text-align:center'>" +
+								"<td>" +
+									"<a id = 'deleteRow" + row + "' class='btn btn-danger' role='button' onclick = 'deleteRow(this)'>" +
+										"{{ LanguageResources.const.Deletion[session['language']] }}" +
+									"</a>" ;
+	
+	// Insert <tr>
+	tableBody.appendChild(newTR) ;
+	
+	document.getElementsByName ("detailInformation" + row)[0].value = detailInformation ;
+	document.getElementsByName ("memberId" + row)[0].value = memberId ;
+	document.getElementsByName ("memberName" + row)[0].value = memberName ;
+	
+	// validation
+	$("input[name=detailInformation" + row + "]").rules("add", {maxlength : 50}) ;
+	$("input[name=memberId" + row + "]").rules("add", {required : true, minlength : 4, maxlength : 20}) ;
+	$("input[name=memberName" + row + "]").rules("add", "required") ;
+}
+// deelte Row in Add Modal
+function deleteRow (obj) {
+	var idNum = obj.id.substring("deleteRow".length) ;
+
+	// Get Table Body
+	var tableBody = document.getElementById ("insertMemberTableBody") ;
+	
+	// confirm button modify name
+	document.getElementById ("memberInsert").name = "memberInsert" + (tableBody.rows.length - 1) ;
+	
+	//Delete Row
+	tableBody.removeChild (document.getElementById ("insertMemberTableBodyRow" + idNum)) ;
+	
+	for (var i = 1 ; i <= tableBody.rows.length ; i++) {
+		if (i >= idNum) {
+			// Get Table BodyRows
+			var bodyRow = document.getElementById ("insertMemberTableBodyRow" + (i + 1)) ;
+			
+			// Change Name or Id
+			bodyRow.id = "insertMemberTableBodyRow" + (i) ;
+			document.getElementsByName("detailInformation" + (i + 1))[0].name = "detailInformation" + i ;
+			document.getElementsByName("memberId" + (i + 1))[0].name = "memberId" + i ;
+			document.getElementsByName("memberName" + (i + 1))[0].name = "memberName" + i ;
+			bodyRow.getElementsByTagName("a")[0].id = "deleteRow" + i ;
+		}
+	}
+}
+ 
+function readFiles(obj) {
+	spinner.spin(target);
+	// File Type  Vaildation
+	files =  document.getElementsByName("files")[0].files ;
+	
+	// .csv text/plain type validation
+	for (var i = 0 ; i < files.length ; i++) {
+		try {
+			var type = files.item(i).name.split(".")[1] ;
+			if (type == "txt" || type == "csv"){
+				var reader = new FileReader () ;
+				try {
+					reader.readAsText(files[i], "EUC-KR") ;
+				} catch (err) {
+					reader.readAsText(files[i], "UTF-8") ;
+				}
+				
+				reader.onload = function (event) {
+					csv_form = event.target.result ;
+			
+					// 1. remove space and newline
+			  	// 2. slice and make information from 'key=value'
+			  	var csv_form = csv_form.replace(' ', '').replace('\n', '').replace('\r', '').replace('\xef\xbb\xbf', '').split(",") ;
+			
+					// Check Date Form
+					if ((csv_form.length -1) == 0 || (csv_form.length -1) % 3 != 0) {
+						alert ("{{ LanguageResources().const.FormTypeError[session['language']] }}") ;
+						return ;
+					}
+				} ;
+				
+				reader.onerror = function (event) {
+					var errCode = event.target.error.code ;
+					
+					if (errCode == 1 ) alert ("Not Found File") ;
+					else if (errCode == 2) alert ("File Changes") ;
+					else if (errCode == 3) alert ("Read Validation") ;
+					else if (errCode == 4) alert ("Authority Problem") ;
+					else if (errCode == 5) alert ("URL Error") ;
+				} ;
+			}
+		} catch (err) {}
+	}
+	$.ajax({
+		success: function(res){
+			spinner.stop();
+		},
+		error: function(res){
+			spinner.stop();
+		}
+	});
+ }
+ 
+jQuery.validator.setDefaults({
+  debug: false,
+  success: "valid"
+});
+
+jQuery.validator.addMethod("acceptType", function (thisType, element) {
+		// File Type  Vaildation
+		files =  document.getElementsByName("files")[0].files ;
+		
+		// .csv text/plain type validation
+		for (var i = 0 ; i < files.length ; i++) {
+			try {
+				var type = files.item(i).name.split(".")[1] ;
+				if (type != "txt" && type != "csv")
+					return false ;
+			}
+			catch (err) {
+				return false ;
+			}
+		}
+		return this.optional(element) == true || true ;
+}, "{{ LanguageResources().const.FileType[session['language']] }}");
+
+$('#memberInsert').click(function(){
+	spinner.spin(target);
+});
+$(function() {
+	$("#insertUserForm").validate({
+		// Default row define
+		rules: {
+			'files' : {
+				acceptType : true
+			}
+		}
+	}) ;
+}) ;
+</script>
+{% endblock -%}

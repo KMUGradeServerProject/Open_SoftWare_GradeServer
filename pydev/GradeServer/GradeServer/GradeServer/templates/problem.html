@@ -1,0 +1,241 @@
+<!-- //////////////////////////////////////////
+		fill every "here" sign using jinja2 template
+		/////////////////////////////////////////// -->
+
+
+{%- extends "main.html" -%}
+{%- block body %}
+<!-- problem space -->
+<div class="container">
+	<div class="nav problem" text-align="center">
+		<h2 class="problem_title">{{ problemInformation.problemName }}</h2>
+		<h4 class="problem_constraints">
+			{{ LanguageResources.const.Limitation[session['language']] }}
+			{{ LanguageResources.const.Time[session['language']] }}
+			:&nbsp;{{ problemInformation.limitedTime }} ms |
+			{{ LanguageResources.const.Limitation[session['language']] }}
+			{{ LanguageResources.const.Memory[session['language']] }}
+			:&nbsp;{{ problemInformation.limitedMemory }} MB
+		</h4>
+	</div>
+
+	<!-- source code space -->
+	<div class="source" bs-example-tabs>
+		<ul class="nav nav-tabs" id="myTabs">
+			<li class="active">			
+				<a href="#upload" data-toggle="tab">
+					{{ LanguageResources.const.UploadFiles[session['language']] }}
+				</a>
+			<li>
+				<a href="#write" data-toggle="tab">
+					{{ LanguageResources.const.WriteCode[session['language']] }}
+				</a>
+			{%- if pdfExists == True %}
+			<li>
+				<a href="#info" data-toggle="tab">
+					{{ LanguageResources.const.ProblemScript[session['language']] }}
+				</a>
+			{%- else %}
+				<li class="disabled">
+					<a href="" data-toggle="">
+						{{ LanguageResources.const.ProblemScript[session['language']] }}
+					</a>
+			{%- endif %}
+		</ul>
+		<div class="tab-content" id="myTabContent2">
+			<div class="tab-pane active" id="upload">
+				<div id="content">
+					<ul class="nav nav-tabs" id="myTab" role="tablist">
+						<li class="dropdown">
+							<a class="dropdown-toggle" id="myTabDrop1" href="#" data-toggle="dropdown"
+								aria-controls="myTabDrop1-contents">
+								<!-- length is 1 show 1 more than select view -->
+							{%- if languageInfoRecords|length == 1 %}
+								{{ languageInfoRecords[0].languageName }}
+							</a>
+							{%- elif languageInfoRecords|length > 1 %}
+								{{ LanguageResources.const.Language[session['language']] }} 	{{ LanguageResources.const.Select[session['language']] }}
+								<span class="caret"></span>
+							</a>
+							<ul class="dropdown-menu" id="myTabDrop1-contents" role="menu"
+								aria-labelledby="myTabDrop1">
+								{%- for languageInfoRecord in languageInfoRecords %}
+									{%- if languageInfoRecord.languageName == "C++" %}
+									<li>
+										<a href="#Cpp" role="tab" data-toggle="tab" aria-controls="Cpp">
+										{{ languageInfoRecord.languageName }}
+										{%- if languageInfoRecord.languageVersion %}
+										{{ languageInfoRecord.languageVersion }}
+										{% endif -%}
+									{% elif languageInfoRecord.languageVersion == "2.7" %}
+									<li>
+										<a href="#{{languageInfoRecord.languageName}}2" role="tab"
+											data-toggle="tab" aria-controls="{{ languageInfoRecord.languageName }}2">
+										{{ languageInfoRecord.languageName }}
+										{%- if languageInfoRecord.languageVersion %}
+										{{ languageInfoRecord.languageVersion }}
+										{% endif -%}
+									{% elif languageInfoRecord.languageVersion == "3.4" %}
+									<li>
+										<a href="#{{languageInfoRecord.languageName}}3" role="tab"
+											data-toggle="tab" aria-controls="{{ languageInfoRecord.languageName }}3">
+										{{ languageInfoRecord.languageName }}
+										{%- if languageInfoRecord.languageVersion %}
+										{{ languageInfoRecord.languageVersion }}
+										{% endif -%}
+									{%- else %}
+									<li>
+										<a href="#{{languageInfoRecord.languageName}}" role="tab"
+											data-toggle="tab" aria-controls="{{ languageInfoRecord.languageName }}">
+										{{ languageInfoRecord.languageName }}
+										{%- if languageInfoRecord.languageVersion %}
+										{{ languageInfoRecord.languageVersion }}
+										{% endif -%}
+									{% endif -%}
+									</a>
+								{% endfor -%}
+							</ul>
+							{% endif -%}
+					</ul>
+					<div class="tab-content" id="myTabContent">
+					{%- for languageInfoRecord in languageInfoRecords %}
+						<!-- C++ Exception Case -->
+						{%- if loop.index0 == 0 %}
+							{%- if languageInfoRecord.languageName == "C++" %}
+						<div class="tab-pane active" id="Cpp" role="tabpanel">
+							{% elif languageInfoRecord.languageVersion == "2.7" %}
+						<div class="tab-pane active" id="{{ languageInfoRecord.languageName }}2" role="tabpanel">
+							{% elif languageInfoRecord.languageVersion == "3.4" %}
+						<div class="tab-pane active" id="{{ languageInfoRecord.languageName }}3" role="tabpanel"> 
+							{%- else %}
+						<div class="tab-pane active" id="{{ languageInfoRecord.languageName }}" role="tabpanel">
+							{% endif -%}
+						
+						{%- else %}
+							{%- if languageInfoRecord.languageName == "C++" %}
+						<div class="tab-pane" id="Cpp" role="tabpanel">
+							{% elif languageInfoRecord.languageVersion == "2.7" %}
+						<div class="tab-pane" id="{{ languageInfoRecord.languageName }}2" role="tabpanel">
+							{% elif languageInfoRecord.languageVersion == "3.4" %}
+						<div class="tab-pane" id="{{ languageInfoRecord.languageName }}3" role="tabpanel"> 
+							{%- else %}
+						<div class="tab-pane" id="{{ languageInfoRecord.languageName }}" role="tabpanel">
+							{% endif -%}
+						
+						{% endif -%}
+						<div>
+							{%- if languageInfoRecord.languageName == "C++" %}
+							<form class="dropzone"  id="my-dropzoneCpp" method="post"
+								    action="/problem_{{ problemIndex }}_{{ pageNum }}_{{ browserName }}_{{ browserVersion }}"
+								    enctype="multipart/form-data">
+							{%- elif languageInfoRecord.languageVersion == "2.7" %}
+							<form class="dropzone"  id="my-dropzone{{ languageInfoRecord.languageName }}2" method="post"
+								    action="/problem_{{ problemIndex }}_{{ pageNum }}_{{ browserName }}_{{ browserVersion }}"
+								    enctype="multipart/form-data">
+							{%- elif languageInfoRecord.languageVersion == "3.4" %}
+							<form class="dropzone"  id="my-dropzone{{ languageInfoRecord.languageName }}3" method="post"
+								    action="/problem_{{ problemIndex }}_{{ pageNum }}_{{ browserName }}_{{ browserVersion }}"
+								    enctype="multipart/form-data">								    
+							{%- else %}
+							<form class="dropzone" id="my-dropzone{{ languageInfoRecord.languageName }}"
+								    method="post" 
+								    action="/problem_{{ problemIndex }}_{{ pageNum }}_{{ browserName }}_{{ browserVersion }}"
+								    enctype="multipart/form-data">
+							{% endif -%}
+								<textarea name="usedLanguageName" style="display:none;">{{ languageInfoRecord.languageName }}</textarea>
+								<textarea name="usedLanguageVersion" style="display:none;">{{ languageInfoRecord.languageVersion }}</textarea>
+									<div class="fallback">
+										{{ LanguageResources.const.NumberOfFiles[session['language']] }} <select type="text" id="number" onchange="selectFiles(this)">
+											<option selected="selected" value="21"> 1 </option>
+											<option value="22"> 2 </option>
+											<option value="23"> 3 </option>
+											<option value="24"> 4 </option>
+											<option value="25"> 5 </option>
+										</select><br><br>
+										<div id="multipleFiles">
+											<input type="file" name="file[]"><br>
+										</div>
+										<input type="submit" value="{{ LanguageResources.const.Submission[session['language']] }}">
+									</div>
+							</form>
+						</div>
+					</div>
+					{% endfor -%} 
+				</div>
+			</div>
+			{%- if browserName != "msie" or browserVersion|length > 3  %}
+			<button class="btn" id="submit-all" type="submit" style="margin-top:5px">
+				{{ LanguageResources.const.Submission[session['language']] }}
+			</button>
+		</div>
+		<div class="tab-pane" id="write">
+			<div>
+				<form action="/problem_page{{ pageNum }}_{{ problemIndex }}"
+					    method="post" enctype="multipart/form-data">				
+					<div style="margin-bottom:10px">
+						{{ LanguageResources.const.Language[session['language']] }}
+						&nbsp;:
+						<select type="text" id="language" name="language" onchange="selectLanguage(this)">
+							{%- for languageInfoRecord in languageInfoRecords %}
+							 {% if languageInfoRecord.languageVersion == "2.7" %}
+							 	<option value="{{ languageInfoRecord.languageName }}2">
+							 {% elif languageInfoRecord.languageVersion == "3.4" %}
+								<option value="{{ languageInfoRecord.languageName }}3">
+							 {% else %}
+							 	<option value="{{ languageInfoRecord.languageName }}">
+							 {% endif %} 
+							 {{ languageInfoRecord.languageName }}
+								{%- if languageInfoRecord.languageVersion %}
+									{{ languageInfoRecord.languageVersion }}
+								{% endif -%} 
+								</option>
+							{% endfor -%}
+						</select>
+						&nbsp; &nbsp; &nbsp; &nbsp; 
+						{{ LanguageResources.const.Theme[session['language']] }}
+						&nbsp;:
+						<select type="text" id="language" name="language" onchange="selectLanguage(this)">
+							<option value="6"> chrome </option>
+							<option value="7"> clouds </option>
+							<option selected="selected" value="8"> eclipse </option>
+							<option value="9"> github </option>
+							<option value="10"> monokai </option>
+							<option value="11"> textmate </option>
+							<option value="12"> tomorrow </option>
+						</select>
+					</div>
+					<pre id="editor"></pre>
+					<div class="actions">
+						<button class="btn" type="submit">
+							{{ LanguageResources.const.Submission[session['language']] }}
+						</button>
+					</div>
+					<textarea name="getCode" id="getCode" style="display:none;"></textarea>
+				</form>
+			</div>
+		</div>
+		{% endif %}
+		<div class="tab-pane" id="info">
+			<object type="application/pdf"
+					 data="/static/ProblemDescriptions/{{ problemName }}/{{ problemName }}.pdf"
+					 width="1000" height="600"></object>
+		</div>
+	</div>
+</div>
+<script>
+var editor=ace.edit("editor");
+
+ace.require("ace/ext/language_tools");
+editor.setTheme("ace/theme/eclipse");
+editor.session.setMode("ace/mode/c_cpp");
+
+editor.setOption("maxLines", 70);
+editor.setOption("minLines", 20);
+editor.setOption("showPrintMargin", false);
+
+editor.getSession().on("change", function () {
+	textarea.val(editor.getSession().getValue());
+});
+</script>
+<!-- comment space -->
+{% endblock -%}

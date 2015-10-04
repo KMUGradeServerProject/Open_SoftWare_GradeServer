@@ -1,0 +1,343 @@
+<!-- //////////////////////////////////////////
+		fill every "here" sign using jinja2 template
+		/////////////////////////////////////////// -->
+		
+{% extends "main.html" %}
+{% block body %}
+<div class="container">
+	
+	<!-- Write Date -->
+	<div style ="text-align:right">
+	{% if articlesOnBoard.updateDate %}
+		{{ LanguageResources.const.UpdateDate[session['language']] }}
+		:
+		{{ get_datetime_delete_sceond(articlesOnBoard.updateDate) }}
+	{% endif %}
+	<br>
+	
+	<!-- Writer -->
+	{% if articlesOnBoard.memberId %}
+		{{ LanguageResources.const.Writer[session['language']] }}
+		: 
+		<a href='{{ url_for("GradeServer.submission_record",
+												memberIdIndex = articlesOnBoard.writerIdIndex,
+												sortCondition = LanguageResources().const.SubmissionDate[1],
+												pageNum = 1) }}'>
+		 {% if articlesOnBoard.memberId %}{{ articlesOnBoard.memberId }}{% endif %}
+		 </a>
+	{% endif %}
+	<br>
+	
+	<!-- View Count -->
+	{% if articlesOnBoard.viewCount %}
+	{{ LanguageResources.const.ViewCount[session['language']] }}
+	:
+	{{ articlesOnBoard.viewCount }}
+	{% endif %}
+	</div>
+	<hr>
+		<div style="word-wrap:break-word">
+			<h4>
+			{% if articlesOnBoard.articleType %}
+				[{{ articlesOnBoard.articleType }}]
+			{% endif %}
+			{% if articlesOnBoard.problemName %}
+				[{{ articlesOnBoard.problemName}}]
+			{% endif %}
+			<br>
+			{% if articlesOnBoard.title %}
+				{{ articlesOnBoard.title }}
+			{% endif %}
+			</h4>
+		</div>
+		
+		<hr>
+</div>
+
+<!-- content block -->
+<div class="container">
+	<!-- put contents here -->
+	<pre  style ="background-color: rgba(255, 255, 255, 0);
+								overflow: auto; width: 100%; height: {{ OtherResources().const.TEXTAREA_ROW }}px;
+							 	max-height: {{ OtherResources().const.MAX_ROW }}]px;"
+		    onclick="autoSize(this, {{ OtherResources().const.TEXTAREA_ROW }}, {{ OtherResources().const.MAX_ROW }})">{% if articlesOnBoard.content %}{{ articlesOnBoard.content }}{% endif %}</pre>
+	<div style="text-align:center">
+		
+		{# Article Like Case #}
+		<button class="btn btn-link articleLikeClick" style = "display:inline">
+		{% if isLikeCancelled == 'FALSE' %}
+			{{ LanguageResources.const.DisLike[session['language']] }} <i class="icon-thumbs-down"></i>
+		{% else %}
+			{{ LanguageResources.const.Like[session['language']] }} <i class="icon-thumbs-up"></i>
+		{% endif %}
+			<!-- Article Like Count -->
+			{{ articlesOnBoard.sumOfLikeCount }}
+		</button>
+		
+		<form method="post" style = "display:inline">
+		
+			{% if articlesOnBoard.writerIdIndex == session['memberIdIndex'] %}
+			{# Modify Article #}
+			<a class="btn btn-info modify" href='{{ url_for("GradeServer.write",
+																						 					articleIndex = articlesOnBoard.articleIndex) }}'>
+				{{ LanguageResources.const.Edit[session['language']] }} <i class="icon-edit"></i>
+			</a>
+			{% endif %}
+			
+			<!-- Delete Article -->
+			{% if articlesOnBoard.writerIdIndex == session['memberIdIndex']
+						or 'ADMINISTRATOR' in session['authority'] %}
+			<button href="#deleteArticle" class="delete btn btn-danger" data-toggle="modal">
+				{{ LanguageResources.const.Deletion[session['language']] }} <i class="icon-trash"></i>
+			</button>
+			<div id="deleteArticle" class="modal hide fade">
+				<div class="modal-header">
+					<h3>
+						{{ LanguageResources.const.Post[session['language']] }}
+						{{ LanguageResources.const.Deletion[session['language']] }}
+					</h3>
+				</div>
+				<div class="modal-body">
+					<p>{{ LanguageResources().const.ReallyDeletion[session['language']] }}</p>
+				</div>
+				<div class="modal-footer">
+					<button class="btn" data-dismiss="modal" aria-hidden="true">
+						{{ LanguageResources.const.Close[session['language']] }}
+					</button>
+					<button href="#" class="delete btn btn-danger" name ="deleteArticle" type="submit">
+						{{ LanguageResources.const.Confirm[session['language']] }}
+					</button>
+				</div>
+			</div>
+			{% endif %}
+		</form>
+	</div>
+</div>
+<!-- end content block -->
+<hr style="margin-left:5%;margin-right:5%">
+
+<!-- comment block -->
+<div class="container">
+	<!-- put the comments here -->
+
+	<form id = "writeReplyForm" method="post">
+		<div class='row-fluid' style='margin-bottom:10px'>
+			<div class='span10'>
+				<textarea name="writeArticleReply" style="width:100%; height: {{ OtherResources().const.REPLY_ROW }}px; max-height: {{ OtherResources().const.MAX_ROW }}px"
+									wrap = "hard"
+									onkeyup="autoSize(this, {{ OtherResources().const.REPLY_ROW }}, {{ OtherResources().const.MAX_ROW }})" autocomplete="off"
+									placeholder="Comment" type = "text"></textarea>
+			</div>
+			<div class="span2">
+				<button class="btn btn-primary submit" style="margin-top:2px;width:100%;height:50px">
+					{{ LanguageResources.const.Write[session['language']] }} <i class="icon-pencil"></i>
+				</button>
+			</div>
+		</div>
+	</form>
+	
+	<form method = "POST">
+		<!-- Delete Reply Modal Views -->
+		<div id="deleteArticleReply" class="modal hide fade" style="text-align:center">
+			<div class="modal-header">
+				<h3>
+					{{ LanguageResources.const.Reply[session['language']] }} {{ LanguageResources.const.Deletion[session['language']] }}
+				</h3>
+			</div>
+			<div class="modal-body">
+				<p>{{ LanguageResources().const.ReallyDeletion[session['language']] }}</p>
+			</div>
+			<div class="modal-footer">
+				<button class="btn" data-dismiss="modal" aria-hidden="true">
+					{{ LanguageResources.const.Close[session['language']] }}
+				</button>
+				<button class="delete btn btn-danger"
+								id = "deleteArticleReplyModal"
+						  	type="submit">
+					{{ LanguageResources.const.Confirm[session['language']] }}
+				</button>
+			</div>
+		</div>
+	</form>		
+			
+	{% for repliesOnBoardRecord in repliesOnBoardRecords %}
+	<hr style ='margin-top:0%;margin-bottom:0%'>
+	<div class='row-fluid'>
+
+		<!-- Content, updateDate -->
+		<div class='row-fluid'>
+			<div class="span10">
+				
+				<div style="display:inline">
+					<a href='{{ url_for ("GradeServer.submission_record",
+															 memberIdIndex = repliesOnBoardRecord.boardReplierIdIndex,
+															 sortCondition= LanguageResources().const.SubmissionDate[1],
+															 pageNum=1) }}'>
+						{% if repliesOnBoardRecord.memberId %}
+							{{ repliesOnBoardRecord.memberId }}
+						{% endif %}
+					</a>
+					:
+					{% if repliesOnBoardRecord.boardRepliedDate %}
+						{{ get_datetime_delete_sceond(repliesOnBoardRecord.boardRepliedDate) }}
+					{% endif %}
+					
+					<!-- like button -->
+					<button class="like btn btn-link replyLikeClick" id = "replyLike{{ repliesOnBoardRecord.boardReplyIndex }}">
+					{% if not repliesOnBoardIsLikeRecords[loop.index0]
+								or repliesOnBoardIsLikeRecords[loop.index0].isLikeCancelled == ENUMResources().const.TRUE %} 
+						<i class="icon-thumbs-up"></i>
+					{% else %} 
+						<i class="icon-thumbs-down"></i>
+					{% endif %}
+						{{ repliesOnBoardRecord.sumOfLikeCount }}
+					</button>
+				</div>
+					
+				<form method="post" style="display:inline">
+					<!-- delete button -->
+					<!-- replier and masters are availables to delete the comments -->
+					{% if repliesOnBoardRecord.memberId == session['memberId']
+								or 'ADMINISTRATOR' in session['authority'] %}
+					<!-- Dlelete Reply Button -->
+					<a id = "deleteArticleReply{{ repliesOnBoardRecord.boardReplyIndex }}" role="button"
+						 class="btn btn-link" data-toggle="modal" onClick = "deleteArticleReply(this)">
+						<i class="icon-trash"></i>
+					</a>
+					{% endif %}
+				</form>
+				{% if repliesOnBoardRecord.memberId == session['memberId'] %}
+				<div style="display:inline">
+					<!-- modify Reply Button -->
+					<button class="btn btn-link"
+						onclick="modifyArticleReply({{ repliesOnBoardRecord.boardReplyIndex }})" role="button" >
+						<i id="modifArticleReplyIcon{{ repliesOnBoardRecord.boardReplyIndex }}" class="icon-pencil"></i>
+					</button>
+				</div>
+				{% endif %}
+				
+				<form id = "modifyReplyForm{{ repliesOnBoardRecord.boardReplyIndex }}" method="POST">
+					<!-- Reply Content Views -->
+					<textarea name="modifyArticleReplyContent{{ repliesOnBoardRecord.boardReplyIndex }}"
+										wrap = "hard"
+										style="width:100%; height: {{ OtherResources().const.REPLY_ROW }}px; max-height: {{ OtherResources().const.MAX_ROW }}px; display:none" autofocus="autofocus"
+										onfocus="autoSize(this, {{ OtherResources().const.REPLY_ROW }}, {{ OtherResources().const.MAX_ROW }})"
+										onkeyup="autoSize(this, {{ OtherResources().const.REPLY_ROW }}, {{ OtherResources().const.MAX_ROW }})"
+										autocomplete="off" placeholder="Comment" rows={{ OtherResources().const.REPLY_ROW }} type = "text">{% if repliesOnBoardRecord.boardReplyContent %}{{ repliesOnBoardRecord.boardReplyContent }}{% endif %}</textarea>
+					
+					<pre id="articleReplyContent{{ repliesOnBoardRecord.boardReplyIndex }}"
+						   style = "overflow: auto; width: 100%; height: {{ OtherResources().const.REPLY_ROW }}px;
+							 					max-height: {{ OtherResources().const.MAX_ROW }}]px;"
+						onclick="autoSize(this, {{ OtherResources().const.REPLY_ROW }}, {{ OtherResources().const.MAX_ROW }})">{% if repliesOnBoardRecord.boardReplyContent %}{{ repliesOnBoardRecord.boardReplyContent }}{% endif %}</pre>
+				</div>
+				
+				<div class="span2" style="margin-top:35px">
+					<button class="btn btn-primary submit" id="modifyArticleReplyConfirm{{ repliesOnBoardRecord.boardReplyIndex }}" 
+						style="width:100%;height:50px; display:none">
+						{{ LanguageResources.const.Confirm[session['language']] }}
+					</button>
+				</div>
+				</form>
+			</div>
+	</div>
+	{% endfor %}
+</div>
+<style> textarea {width:300px; overflow:visible} </style>
+<script>
+	
+	// delete Article reply
+	function deleteArticleReply (obj) {
+		
+		// Set href (modal)
+		obj.href = "#deleteArticleReply" ;
+		
+		// set Name
+		$("#deleteArticleReplyModal").attr("name", "deleteArticleReply" + obj.id.substring("deleteArticleReply".length)) ;
+	}
+	
+$(function(){
+	// modal position re-place event for initial
+	placeModalCenter("deleteArticle");
+	placeModalCenter("deleteArticleReply");
+	$(window).resize(function(){
+		// when resize the window size
+		placeModalCenter("deleteArticle");
+		placeModalCenter("deleteArticleReply");
+	});
+});
+
+// Modify Reply
+function modifyArticleReply (boardReplyIndex) {
+	
+	modifyIcon = document.getElementById("modifArticleReplyIcon" + boardReplyIndex) ;
+	if (modifyIcon.className == "icon-pencil") {
+		modifyIcon.className = "icon-remove-sign" ;
+	
+		document.getElementsByName("modifyArticleReplyContent" + boardReplyIndex)[0].style.display = 'block' ;
+		
+		document.getElementById("modifyArticleReplyConfirm" + boardReplyIndex).style.display = 'block' ;
+		document.getElementById("articleReplyContent" + boardReplyIndex).style.display = 'none' ;
+		try{
+			$("#modifyReplyForm" + boardReplyIndex).validate() ;
+			$("textarea[name=modifyArticleReplyContent" + boardReplyIndex + "]").rules("add", {required: true}) ;
+		} catch (err){}
+	}
+	else {
+		modifyIcon.className = "icon-pencil" ;
+		
+		document.getElementsByName("modifyArticleReplyContent" + boardReplyIndex)[0].style.display = 'none' ;
+		
+		document.getElementById("modifyArticleReplyConfirm" + boardReplyIndex).style.display = 'none' ;
+		document.getElementById("articleReplyContent" + boardReplyIndex).style.display = 'block' ;
+	}
+}
+
+
+$(function(){
+	// ArticleLike
+	$('.articleLikeClick').click(function() {
+		$.ajax({
+		  type: "POST",
+  		url: "/article_like_click%3FarticleIndex={{ articlesOnBoard.articleIndex }}",
+  		success : function(response) {
+				if ($(".articleLikeClick").html().indexOf("icon-thumbs-up") != -1) {
+					$(".articleLikeClick").html("{{ LanguageResources.const.DisLike[session['language']] }} <i class='icon-thumbs-down'></i> " + response) ;
+				}
+				else {
+					$(".articleLikeClick").html("{{ LanguageResources.const.Like[session['language']] }} <i class='icon-thumbs-up'></i> " + response) ;
+				}
+  			}
+		});
+	});
+	
+	// ReplyLike
+	$('.replyLikeClick').click(function() {
+		var index = $(this).attr("id").substring("replyLike".length) ;
+		
+		$.ajax({
+		  type: "POST",
+  		url: "/board_reply_like_click%3FboardReplyIndex=" + index,
+  		success : function(response) {
+  			if ($("#replyLike" + index).html().indexOf("icon-thumbs-up") != -1) {
+					$("#replyLike" + index).html("<i class='icon-thumbs-down'></i> " + response) ;
+				}
+				else {
+					$("#replyLike" + index).html("<i class='icon-thumbs-up'></i> " + response) ;
+				}
+  				
+  			}
+		});
+	});
+	
+	$("#writeReplyForm").validate({
+		rules: {
+			'writeArticleReply': {
+				required: true
+			}
+		}
+	}) ;
+});
+	
+</script>
+<!-- end comment block -->
+{% endblock %}

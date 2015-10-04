@@ -1,0 +1,151 @@
+<!-- //////////////////////////////////////////
+		fill every "here" sign using jinja2 template
+		/////////////////////////////////////////// -->
+		
+{%- extends "main.html" -%}
+{%- block body %}
+<div class="container">
+	<h3>
+		{{ LanguageResources.const.NewArticle[session['language']] }}
+	</h3>
+	<form id = "writeForm" method="post">
+		<!-- Article Type Selection -->
+		<div class='row-fluid'>
+			<h4>
+				<div class='span2' style='text-align:center'>
+					{{ LanguageResources.const.ArticleType[session['language']] }}
+				</div>
+				<div class='span10'>
+					<select class="span3" type="text" name="articleType">
+					{%- for type in articleTypes %}
+						{% if loop.index0 == 0
+									and 'ADMINISTRATOR' in session['authority'] %}
+						<option value = "{{ type }}"
+										{% if type == articleType
+													or type == articlesOnBoard.articleType %}
+										selected="selected"
+								  	{% endif %}>
+							{% if type == ENUMResources().const.NOTICE %}
+							{{ LanguageResources().const.Notice[session['language']] }}
+							{% elif type == ENUMResources().const.QUESTION %}
+							{{ LanguageResources().const.Question[session['language']] }}
+							{% elif type == ENUMResources().const.NORMAL %}
+							{{ LanguageResources().const.Normal[session['language']] }}
+							{% endif %}
+						</option>
+						{% elif loop.index0 > 0
+										and 'USER' in session['authority'] %}
+						<option value = "{{ type }}"
+										{% if type == articleType
+													or type == articlesOnBoard.articleType %}
+										selected="selected"
+								  	{% endif %}>
+							{% if type == ENUMResources().const.NOTICE %}
+							{{ LanguageResources().const.Notice[session['language']] }}
+							{% elif type == ENUMResources().const.QUESTION %}
+							{{ LanguageResources().const.Question[session['language']] }}
+							{% elif type == ENUMResources().const.NORMAL %}
+							{{ LanguageResources().const.Normal[session['language']] }}
+							{% endif %}
+						</option>
+						{% endif %}
+					{% endfor -%}
+					</select>
+				</div>
+			</h4>
+		</div>
+		
+		<div class='row-fluid'>
+			<!-- Problem Selection -->
+			<h4>
+				<div class='span2' style='text-align:center'>
+					{{ LanguageResources.const.Problem[session['language']] }}
+				</div>
+				<div class='span10'>
+				
+				<select class="span3" type="text" name="problemIndex">
+					<!-- None Selection -->
+					<option value =""
+									{% if articlesOnBoard
+												and not articlesOnBoard.problemIndex %}
+									selected="selected"
+									{% endif %}>
+					</option>
+					{% if 'ADMINISTRATOR' not in session['authority'] %}
+						{% set problemRecords = get_problems() %}
+						{%- for problem in problemRecords %}
+							{% if problem.problemName %}
+							<option value = "{{ problem.problemIndex }}"
+											{% if problem.problemIndex == problemIndex
+														or problem.problemIndex == articlesOnBoard.problemIndex %}
+											selected="selected"
+									  	{% endif %}>
+								
+									{{ problem.problemName }}
+								
+							</option>
+							{% endif %}
+						{% endfor -%}
+					{% endif %}
+				</select>
+				</div>
+			</h4>
+		</div>
+		
+		<div class='row-fluid'>
+			<h4>
+				<div class='span2' style='text-align:center'>
+					{{ LanguageResources.const.Title[session['language']] }} 
+				</div>
+				<div class='span10'>
+					<input class="input-xxlarge" name="title" type="text"
+							autocomplete="off" autofocus="autofocus"
+							placeholder="title"
+							value="{% if title %}{{ title }}{% elif articlesOnBoard %}{{ articlesOnBoard.title }}{% endif %}">
+				</div>
+			</h4>
+		</div>
+		<div class='row-fluid'>
+			<h4>
+				<div class='span2' style='text-align:center'></div>
+				<div class='span10'>
+					<textarea class = "input-xxlarge" name="content" placeholder="write here"
+										style = "height: {{ OtherResources().const.TEXTAREA_ROW }}px; max-height: {{ OtherResources().const.MAX_ROW }}px;"
+										wrap = "hard"
+										onkeyup="autoSize(this, {{ OtherResources().const.TEXTAREA_ROW }}, {{ OtherResources().const.MAX_ROW }})"
+										onfocus="autoSize(this, {{ OtherResources().const.TEXTAREA_ROW }}, {{ OtherResources().const.MAX_ROW }})"
+							      autocomplete="off" rows={{ OtherResources().const.TEXTAREA_ROW }}>{% if content %}{{ content }}{% elif articlesOnBoard %}{{ articlesOnBoard.content }}{% endif %}</textarea>
+				</div>
+			</h4>
+		</div>
+		<br>
+		<div class='row-fluid'>
+			<h4>
+				<div class='span2' style='text-align:center'></div>
+				<div class='span10'>
+					<input class = "btn btn-primary" type="submit" value="{{ LanguageResources.const.Done[session['language']] }}">
+				</div>
+			</h4>
+		</div>
+	</form>
+</div>
+<style> textarea {width:300px; overflow:visible} </style>
+<script>
+	
+	jQuery.validator.setDefaults({
+	  debug: false,
+	  success: "valid"
+	});
+	$(function() {
+		$("#writeForm").validate({
+			rules: {
+				'title': {
+					required: true,
+					maxlength: 100
+				},
+				'content': "required"
+			}
+		}) ;
+	}) ;
+</script>
+{% endblock -%}

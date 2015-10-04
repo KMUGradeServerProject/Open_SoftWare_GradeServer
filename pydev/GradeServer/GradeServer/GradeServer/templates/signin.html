@@ -1,0 +1,19 @@
+{% extends "main.html" %}
+{%- block body %}
+<div class="container">
+	<h3>Sign in</h3>
+	<form method="post">
+		<input class="span2" id="id" name="memberId" type="text"
+				placeholder="ID" autocomplete="off" autofocus="autofocus" style="display:inline;margin-bottom:0px">
+				
+		<input class="span2" id="pw" name="password" type="password"
+				placeholder="Password" style="display:inline">
+				
+		<button class="btn" id="submit" type="submit" style="display:inline">
+			{%- if session['language'] %}	{{ LanguageResources.const.Confirm[session['language']] }}
+			{%- else %}{{ LanguageResources.const.Confirm[0] }} <!-- default -->
+			{% endif -%}
+		</button>
+	</form>
+</div>
+{% endblock -%}
