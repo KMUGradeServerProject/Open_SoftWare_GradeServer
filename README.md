@@ -22,12 +22,16 @@ redis의 port번호는 기본값인 6379로 해야합니다. 이는 추후 설�
 
 
 ### 사용방법
-1. repository에 있는 모든 파일을 다운 받습니다.
-2. sudo 권한으로 make파일을 실행합니다. make 파일을 python으로 만들어졌으며, python make.py로 실행합니다.
-   docker image파일 생성까지 진행하기 때문에 상당시간 소요될 수 있습니다.
-3. 설치가 완료되면 runserver를 실행합니다. 실행 시 DB 사용자 이름과 비밀번호를 순서대로 함께 입력합니다.
+1. 사용자 계정에 대하여 sudo 접근 비밀번호를 해제한다.
+   (sudo visudo를 수정)
+2. repository에 있는 모든 파일을 다운 받는다..
+3. sudo 권한으로 make파일을 실행합니다. make 파일을 python으로 만들어졌으며, python make.py로 실행한다.
+   docker image파일 생성까지 진행하기 때문에 상당시간 소요될 수 있음.
+4. celeryServer폴더에 들어가 일반 사용자 권한으로 celery서버를 실행한다.
+   (celery -A celeryServer worker -l info --concurrency=1)
+5. 설치가 완료되면 sudo 권한으로 runserver를 실행한다. 실행 시 DB 사용자 이름과 비밀번호를 순서대로 함께 입력한다.
    ex) python runserver.py serverId pw1234
-4. 서버는 Ctrl+C를 눌러 종료합니다.
+6. 서버는 Ctrl+C를 눌러 종료한다.
 
 
 ### 권장 시스템 사양
