@@ -28,5 +28,7 @@ redis의 port번호는 기본값인 6379로 해야합니다. 이는 추후 설�
 
 ### 권장 시스템 사양
 운영체제 : centOS(추후 ubuntu 지원) - Windows에선 사용 불가.
+
 최소사양 : CPU 2.0GHz 3core, RAM 2GB, HDD 8GB
+
 권장사양 : CPU 2.7GHz 4core, RAM 3GB, HDD 10GB 이상
