@@ -403,6 +403,11 @@ function readFiles(obj) {
 						alert ("{{ LanguageResources().const.FormTypeError[session['language']] }}") ;
 						return ;
 					}
+					else {
+						for (var i = 3 ; i < csv_form.length -1 ; i+=3) {
+							addlineMember (csv_form[i], csv_form[i + 1], csv_form[i + 2])  ;
+						}
+					}
 				} ;
 				
 				reader.onerror = function (event) {
