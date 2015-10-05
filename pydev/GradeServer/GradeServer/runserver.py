@@ -33,7 +33,7 @@ if __name__ == '__main__':
     try:
         IOLoop.instance().start ()
     except (KeyboardInterrupt, SystemExit):
-        os.system('celery multi stop')
+        os.system('celery multi stop worker -A celeryServer -l info --concurrency=1')
         
         print 'container stop&rm'
         os.system('docker stop grade_container1')
