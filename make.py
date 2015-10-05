@@ -1,9 +1,8 @@
 import os
 import sys
-import getpass
 import platform
 
-if getpass.getuser() != 'root':
+if os.getuid is not 0:
     print "only run this program as 'root'"
     sys.exit(1)
 
