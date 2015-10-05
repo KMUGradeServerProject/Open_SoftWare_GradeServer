@@ -24,7 +24,7 @@ except Exception:
 pid = os.fork()
 
 if pid is not 0:
-    time.sleep(2)
+    time.sleep(4)
     serverDir = root.replace('runserver.py', 'pydev/GradeServer/GradeServer')
     os.chdir(serverDir)
     os.execl('/usr/bin/sudo', '/usr/bin/sudo', 'python', 'runserver.py', dbUserName, dbPassword)
