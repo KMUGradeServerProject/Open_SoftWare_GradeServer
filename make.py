@@ -2,7 +2,7 @@ import os
 import sys
 import platform
 
-if os.getuid is not 0:
+if os.getuid() is not 0:
     print "only run this program as 'root'"
     sys.exit(1)
 
