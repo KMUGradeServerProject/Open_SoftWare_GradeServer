@@ -24,7 +24,7 @@ except Exception:
 pid = os.fork()
 
 if pid is not 0:
-    time.sleep(2)
+    time.sleep(2.2)
     
     dockerDir = root.replace('runserver.py', 'Dockerfiles/GradeServer_Docker')
     os.system('sudo python ' + dockerDir + '/create_container.py')
@@ -43,4 +43,5 @@ else:
     fp.close()
     
     os.system('celery multi start worker -A celeryServer -l info -c 1 --pidfile="./%n.pid"')
+    time.sleep(0.8)
     os.system('rm -rf data.txt')
