@@ -1,4 +1,4 @@
-# Open_SoftWare_GradeServer
+# Open_SoftWare_GradeServer !! 현재 수정작업 중입니다. 사용이 불편할 수 있습니다.최대한 빨리 수정하겠습니다.!!
 ##2015 오픈소프트 개발자 대회 출품작 -GradeServer
 
 ### GradeServer란?
