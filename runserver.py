@@ -24,7 +24,13 @@ except Exception:
 pid = os.fork()
 
 if pid is not 0:
-    time.sleep(2.2)
+    time.sleep(1)
+    
+    if os.getgroups().count(1410) is 0:
+        os.system('sudo groupadd -g docker')
+        os.system('sudo gpasswd -a ${USER} docker')
+        os.system('sudo service docker restart')
+        os.system('newgrp docker')
     
     dockerDir = root.replace('runserver.py', 'Dockerfiles/GradeServer_Docker')
     os.system('sudo python ' + dockerDir + '/create_container.py')
