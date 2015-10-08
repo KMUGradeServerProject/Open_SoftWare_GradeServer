@@ -20,7 +20,7 @@ class FileTools(object):
             logging.debug(e)
             logging.info('file error : ' + fileName + ' read error')
             
-            print ENUMResources.const.SERVER_ERROR, 0, 0, 0
+            sys.stderr.write(ENUMResources.const.SERVER_ERROR + ' ' + str(0) + ' ' + str(0) + ' ' + str(0))
             sys.exit()
         
         lines = readFile.readlines()
@@ -37,7 +37,7 @@ class FileTools(object):
             logging.debug(e)
             logging.info('file error : ' + fileName + ' read error')
             
-            print ENUMResources.const.SERVER_ERROR, 0, 0, 0
+            sys.stderr.write(ENUMResources.const.SERVER_ERROR + ' ' + str(0) + ' ' + str(0) + ' ' + str(0))
             sys.exit()
         
         allFile = readFile.read()
@@ -58,7 +58,7 @@ class FileTools(object):
             logging.debug(e)
             logging.info('file error : ' + oldName + ' copy error')
             
-            print ENUMResources.const.SERVER_ERROR, 0, 0, 0
+            sys.stderr.write(ENUMResources.const.SERVER_ERROR + ' ' + str(0) + ' ' + str(0) + ' ' + str(0))
             sys.exit()
     
     # 리스트의 모든 파일을 지정한 경로로 복사    
@@ -71,5 +71,5 @@ class FileTools(object):
             logging.debug(e)
             logging.info('file error : All file copy error')
             
-            print ENUMResources.const.SERVER_ERROR, 0, 0, 0
+            sys.stderr.write(ENUMResources.const.SERVER_ERROR + ' ' + str(0) + ' ' + str(0) + ' ' + str(0))
             sys.exit()
