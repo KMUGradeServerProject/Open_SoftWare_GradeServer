@@ -71,7 +71,7 @@ class ExecutionTools(object):
                  result = ENUMResources.const.MEMORY_OVERFLOW
         
         elif not result:
-            print ENUMResources.const.SERVER_ERROR, 0, 0, 0
+            sys.stderr.write(ENUMResources.const.SERVER_ERROR + ' ' + str(0) + ' ' + str(0) + ' ' + str(0))
             sys.exit()
         
         return result, userTime, usingMem
