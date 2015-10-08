@@ -52,7 +52,7 @@ def Grade(submissionIndex, submissionCount, problemIndex, filePath,
     
     print 'program start'
     
-    os.system(containerCommand + argsList + ' 1>container.txt')
+    os.system(containerCommand + argsList + ' 2>container.txt')
     UpdateResult(submissionIndex, submissionCount, problemIndex, sharingDirName)
     
 """    message = Popen(containerCommand + argsList, shell=True, stdout=PIPE)
