@@ -24,13 +24,7 @@ except Exception:
 pid = os.fork()
 
 if pid is not 0:
-    time.sleep(1.5)
-    
-    if os.getgroups().count(1410) is 0:
-        os.system('sudo groupadd -g docker')
-        os.system('sudo gpasswd -a ${USER} docker')
-        os.system('sudo service docker restart')
-        os.system('newgrp docker')
+    time.sleep(2.2)
     
     dockerDir = root.replace('runserver.py', 'Dockerfiles/GradeServer_Docker')
     os.system('sudo python ' + dockerDir + '/create_container.py')
@@ -48,6 +42,6 @@ else:
     fp.write(dbPassword + '\n')
     fp.close()
     
-    os.system('celery -A celeryServer worker -l info -c 1 --pidfile="./%n.pid" 1>celery.log')
+    os.system('celery multi start worker -A celeryServer -l info -c 1 --pidfile="/%n.pid" --logfile="./%n.log"')
     time.sleep(0.8)
     os.system('rm -rf data.txt')
