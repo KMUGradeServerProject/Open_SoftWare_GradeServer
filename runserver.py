@@ -42,6 +42,6 @@ else:
     fp.write(dbPassword + '\n')
     fp.close()
     
-    os.system('celery multi start worker -A celeryServer -l info -c 1 --pidfile="/%n.pid" --logfile="./%n.log"')
+    os.system('celery multi start worker -A celeryServer -l info -c 1 --pidfile="./%n.pid" --logfile="./%n.log"')
     time.sleep(0.8)
     os.system('rm -rf data.txt')
