@@ -67,5 +67,5 @@ class InterfaceGrade(object):
             logging.debug(self.parameter.saveDirectoryName + ' grade end')
             
             #채점 완료 후 프로그램 종료
-        print success, score, runTime, usingMem
+        sys.stderr.write(success + ' ' + score + ' ' + runTime + ' ' + usingMem)
         sys.exit()
