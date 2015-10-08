@@ -1,5 +1,4 @@
-# Open_SoftWare_GradeServer !! 현재 수정작업 중입니다. 사용이 불편할 수 있습니다.최대한 빨리 수정하겠습니다.!!
-##2015 오픈소프트 개발자 대회 출품작 -GradeServer
+# Open_SoftWare_GradeServer
 
 ### GradeServer란?
 프로그래밍 공부를 위해 알고리즘 문제를 제공하는 사이트들을 많이 이용하실 겁니다. 바로 그런 알고리즘 채점 사이트를 간단하게 개설 할 수 있도록 만든 것이 저희의 GradeServer입니다.
@@ -25,14 +24,13 @@ redis의 port번호는 기본값인 6379로 해야합니다. 이는 추후 설�
 #### 설치방법 및 실행
 1. 사용자 계정에 대하여 sudo 접근 비밀번호를 해제한다.
    (sudo visudo를 수정)
-2. repository에 있는 모든 파일을 다운 받는다..
+2. repository에 있는 모든 파일을 다운 받는다.
 3. sudo 권한으로 make파일을 실행합니다. make 파일을 python으로 만들어졌으며, python make.py로 실행한다.
    docker image파일 생성까지 진행하기 때문에 상당시간 소요될 수 있음.
-4. 설치가 완료되면 sudo 권한으로 runserver를 실행한다. 실행 시 DB 사용자 이름과 비밀번호를 순서대로 함께 입력한다.
+4. 설치가 완료되면 runserver를 실행한다. 실행 시 DB 사용자 이름과 비밀번호를 순서대로 함께 입력한다.
    ex) python runserver.py serverId pw1234
-5. 새로운 터미널에서 celeryServer폴더에 들어가 일반 사용자 권한으로 celery서버를 실행한다.
-   * celery -A celeryServer worker -l info --concurrency=1
-6. 서버는 Ctrl+C를 눌러 종료한다.
+5. 서버는 Ctrl+C를 눌러 종료한다.
+* redis와 db는 서버 실행 전 반드시 먼저 실행해야 합니다. (redis는 root계정으로 여는 것을 권장함.)
 
 #### 관리자 사용방법
 서버 실행 시 관리자 계정은 자동으로 생성되며, 아이디와 비밀번호는 'master'로 초기화 돼있습니다.
