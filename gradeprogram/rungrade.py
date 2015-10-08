@@ -14,7 +14,7 @@ if __name__ == '__main__':
     
     # 명령행 인수 개수가 맞지 않는 경우
     if len(args) is not 11:
-        print ENUMResources.const.SERVER_ERROR, 0, 0, 0
+        sys.stderr.write(ENUMResources.const.SERVER_ERROR + ' ' + str(0) + ' ' + str(0) + ' ' + str(0))
         sys.exit()
     
     logging.debug(args[3] + ' grading start')
