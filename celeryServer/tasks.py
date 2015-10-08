@@ -52,7 +52,10 @@ def Grade(submissionIndex, submissionCount, problemIndex, filePath,
     
     print 'program start'
     
-    message = Popen(containerCommand + argsList, shell=True, stdout=PIPE)
+    os.system(containerCommand + argsList + ' 1>container.txt')
+    UpdateResult(submissionIndex, submissionCount, problemIndex, sharingDirName)
+    
+"""    message = Popen(containerCommand + argsList, shell=True, stdout=PIPE)
     
     for i in xrange(limitTime*100):
         if message.poll() == None: 
@@ -65,11 +68,14 @@ def Grade(submissionIndex, submissionCount, problemIndex, filePath,
     else:
         UpdateResult('SERVER_ERROR', submissionIndex, submissionCount, problemIndex)
 	Restart(worker_num)
+"""
         
-def UpdateResult(messageLine, submissionIndex, submissionCount,
+def UpdateResult(submissionIndex, submissionCount,
                  problemIndex, sharingDirName = None):        
     dataUpdate = DBUpdate.DBUpdate(submissionIndex, submissionCount, problemIndex)
     
+    fp = open('container.txt')
+    messageLine = fp.readlines()[-1]
     messageParaList = messageLine.split()
     
     dirPath = sharingDirName + "/message.txt"
