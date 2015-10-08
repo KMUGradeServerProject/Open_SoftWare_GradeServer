@@ -38,6 +38,7 @@ if osInfo[0] == 'centos':
     os.system('pip install redis')
 
     os.system('service docker start')
+    os.system('chkconfig docker on')
 
     dockerDir = root.replace('make.py', '')
     
