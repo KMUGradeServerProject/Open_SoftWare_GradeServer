@@ -24,7 +24,7 @@ except Exception:
 pid = os.fork()
 
 if pid is not 0:
-    time.sleep(1)
+    time.sleep(1.5)
     
     if os.getgroups().count(1410) is 0:
         os.system('sudo groupadd -g docker')
@@ -48,6 +48,6 @@ else:
     fp.write(dbPassword + '\n')
     fp.close()
     
-    os.system('celery multi start worker -A celeryServer -l info -c 1 --pidfile="./%n.pid"')
+    os.system('celery -A celeryServer worker -l info -c 1 --pidfile="./%n.pid" 1>celery.log')
     time.sleep(0.8)
     os.system('rm -rf data.txt')
