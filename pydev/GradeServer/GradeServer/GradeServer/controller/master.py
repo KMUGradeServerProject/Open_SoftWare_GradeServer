@@ -202,8 +202,7 @@ show create Problems page
 @GradeServer.route('/manage_problem?page=<int:pageNum>&problemLevel=<problemLevel>', methods=['GET', 'POST'])
 @login_required
 @check_invalid_access
-def manage_problem(problemLevel, pageNum, error = None):
-    print "why"
+def manage_problem(problemLevel, pageNum, error = None):\
     try:
         # Upload Problems Files
         if request.method == 'POST':
@@ -402,10 +401,8 @@ def server_manage_service():
 
 
 def post_problem(request, error = None):
-    print "--"
     if 'upload' in request.form:
         files = request.files.getlist('files')
-        print "000"
         # Get Fle Failed
         if not list(files)[0].filename:
             return LanguageResources().const.UploadingFileError
@@ -446,7 +443,6 @@ def post_problem(request, error = None):
             So it needs to be decoded by cp949
             ''' 
             problemName = str(rowProblemName.decode('cp949'))
-            print "AA"
             # if decoded name is the same with before decoding, 
             # it means the file is not created on window environment
             isFromWindow = True if rowProblemName != problemName\
@@ -458,7 +454,6 @@ def post_problem(request, error = None):
             
             problemInformationPath = ('%s/%s.txt' %(tmpPath,
                                                     problemName)).replace('\ ', ' ')
-            print "BB"
             try:
                 # 'open' command can handle space character without '\' mark,
                 # Replace '\ ' to just space ' '
@@ -480,10 +475,8 @@ def post_problem(request, error = None):
             '''
             if isFromWindow:
                 problemInformation = problemInformation.decode('cp949')
-            print "CCC"
             # slice and make key, value pairs from csv form
             problemInformation = problemInformation.replace(' ', '').split(',')
-            print "DDD"
             # re-slice and make information from 'key=value'
             for eachInformation in problemInformation:
                 key, value = eachInformation.split('=')
@@ -500,7 +493,6 @@ def post_problem(request, error = None):
                     limitedTime = int(value)
                 elif key == 'LimitedMemory':
                     limitedMemory = int(value)
-            print "??"   
             # Insert new problem
             problemPath = '%s/%s' % (problemsPath,
                                      problemName.replace(' ', ''))
