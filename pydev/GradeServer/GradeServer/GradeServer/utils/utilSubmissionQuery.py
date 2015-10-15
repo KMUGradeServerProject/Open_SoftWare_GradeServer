@@ -417,10 +417,9 @@ def select_replies_on_code(submissionIndex, submissionReplyIndex = None, isDelet
 ''' 
 Insert Replies on Code
 '''
-def insert_replies_on_code(submissionIndex, memberParameter, articleParameter):
+def insert_replies_on_code(submissionIndex, memberIdIndex, articleParameter):
     return RepliesOnSubmission(submissionIndex = submissionIndex,
-                               codeReplierOrganizationIndex = memberParameter.organizationIndex,
-                               codeReplierIdIndex = memberParameter.memberIdIndex,
+                               codeReplierIdIndex = memberIdIndex,
                                codeReplyContent = articleParameter.content,
                                codeReplierIp = articleParameter.updateIp,
                                codeRepliedDate = articleParameter.updateDate)
@@ -438,20 +437,18 @@ def insert_language(languageName, languageVersion = None):
 '''
 Insert Code likes
 '''
-def insert_likes_on_code(submissionIndex, memberParameter):
+def insert_likes_on_code(submissionIndex, memberIdIndex):
     return LikesOnSubmission(submissionIndex = submissionIndex,
-                             codeLikerOrganizationIndex = memberParameter.organizationIndex,
-                             codeLikerIdIndex = memberParameter.memberIdIndex)
+                             codeLikerIdIndex = memberIdIndex)
                         
                         
                         
 '''
 Insert LikesOnReplies Code
 '''
-def insert_likes_on_reply_of_code(submissionReplyIndex, memberParameter): 
+def insert_likes_on_reply_of_code(submissionReplyIndex, memberIdIndex): 
     return LikesOnReplyOfSubmission(submissionReplyIndex = submissionReplyIndex,
-                                    codeReplyLikerOrganizationIndex = memberParameter.organizationIndex,
-                                    codeReplyLikerIdIndex = memberParameter.memberIdIndex)
+                                    codeReplyLikerIdIndex = memberIdIndex)
 
 
 
