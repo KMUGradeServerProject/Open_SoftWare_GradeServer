@@ -202,7 +202,7 @@ show create Problems page
 @GradeServer.route('/manage_problem?page=<int:pageNum>&problemLevel=<problemLevel>', methods=['GET', 'POST'])
 @login_required
 @check_invalid_access
-def manage_problem(problemLevel, pageNum, error = None):\
+def manage_problem(problemLevel, pageNum, error = None):
     try:
         # Upload Problems Files
         if request.method == 'POST':
