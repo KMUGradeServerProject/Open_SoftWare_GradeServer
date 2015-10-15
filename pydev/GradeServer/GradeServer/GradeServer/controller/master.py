@@ -126,7 +126,7 @@ def handle_file_came_from_window(rowProblemName, decodedProblemName):
                 
         # If SOLUTION or CHEKER file doesn't exist then it's an error
         else:
-            error='There is no \'SOLUTION\' or \'CHECKER\' directory'
+            error=LanguagesResources().const.SolutionCheckerDirError
         
     return error
 
@@ -139,7 +139,7 @@ def remove_space_from_names_in(path):
             subprocess.call('for f in *;do mv "$f" `echo $f|sed "s/ //g"`;done',\
                             shell=True)
         except OSError:
-            error='Error has been occurred while removing space on file names'
+            error=LanguageResources().const.RemoveSpaceError
     
     return error
 
@@ -151,7 +151,7 @@ def get_current_path():
     try:
         currentPath=os.getcwd()
     except OSError:
-        error='Error has been occurred while getting current path'
+        error=LanguageResources().const.GetCurrentDirError
 
     return currentPath, error                                        
 
@@ -162,7 +162,7 @@ def change_directory_to(path):
     try:
         os.chdir(path)
     except OSError:
-        error='Error has been occurred while changing directory'
+        error=LanguageResources().const.ChangeDirError
     
     return error
 
@@ -173,7 +173,7 @@ def rename_file(fromA, toB):
     try:
         subprocess.call('mv %s %s' % (fromA, toB), shell=True)
     except OSError:
-        error='Error has been occurred while renaming file'
+        error=LanguageResources().const.RenameFileError
     
     return error
 
@@ -184,13 +184,13 @@ def remove_carriage_return(path):
         try:
             subprocess.call('cp %s/static/shell/remove_crlf.sh ./' % pyPath, shell=True)
         except:
-            return 'Can not move .sh to problem in/out file path'
+            return LanguageResources().const.MoveShellError
         
         try:
             subprocess.call('sh remove_crlf.sh', shell=True)
             subprocess.call('rm *.sh *.sh+tmp', shell=True)
         except:
-            return 'Can not remove .sh file'
+            return LanguageResources().const.RemoveShellError
     
     return error
 
@@ -203,6 +203,7 @@ show create Problems page
 @login_required
 @check_invalid_access
 def manage_problem(problemLevel, pageNum, error = None):
+    print "why"
     try:
         # Upload Problems Files
         if request.method == 'POST':
@@ -401,13 +402,13 @@ def server_manage_service():
 
 
 def post_problem(request, error = None):
-    
+    print "--"
     if 'upload' in request.form:
         files = request.files.getlist('files')
-        
+        print "000"
         # Get Fle Failed
         if not list(files)[0].filename:
-            return 'Uploading file error'
+            return LanguageResources().const.UploadingFileError
 
         # read each uploaded file(zip)
         for fileData in files:
@@ -425,7 +426,7 @@ def post_problem(request, error = None):
                     subprocess.call('rm -rf %s' % tmpPath,
                                     shell = True)
                 except OSError:
-                    return 'Cannot delete \'tmp\' folder'
+                    return LanguageResources().const.DeleteFolderError
             
             # unzip file
             with zipfile.ZipFile(fileData,
@@ -437,7 +438,7 @@ def post_problem(request, error = None):
                                           os.listdir(tmpPath)[0])[0].\
                                              replace(' ', '\ ')
             except OSError:
-                return 'Error has been occurred while listing file names'\
+                return LangaugeResources().const.ListingFilesError
             '''
             @@ Decode problem name
             
@@ -445,20 +446,19 @@ def post_problem(request, error = None):
             So it needs to be decoded by cp949
             ''' 
             problemName = str(rowProblemName.decode('cp949'))
-            
+            print "AA"
             # if decoded name is the same with before decoding, 
             # it means the file is not created on window environment
             isFromWindow = True if rowProblemName != problemName\
                            else False
             
             if isFromWindow:
-                if handle_file_came_from_window(rowProblemName,
-                                                problemName):
-                    return error
+                error = handle_file_came_from_window(rowProblemName, problemName)
+                if error: return error
             
             problemInformationPath = ('%s/%s.txt' %(tmpPath,
                                                     problemName)).replace('\ ', ' ')
-
+            print "BB"
             try:
                 # 'open' command can handle space character without '\' mark,
                 # Replace '\ ' to just space ' '
@@ -468,10 +468,10 @@ def post_problem(request, error = None):
                 try:
                     problemInfoFile.close()
                 except IOError:
-                    return 'Error has been occurred while closing problem meta file'
+                    return LanguageResources().const.ClosingFileError
                     
             except IOError:
-                return 'Error has been occurred while reading problem meta file(.txt)'
+                return LanguageResources().const.ReadingFileError
 
             '''
             @@ Decode problem meta information
@@ -480,10 +480,10 @@ def post_problem(request, error = None):
             '''
             if isFromWindow:
                 problemInformation = problemInformation.decode('cp949')
-            
+            print "CCC"
             # slice and make key, value pairs from csv form
             problemInformation = problemInformation.replace(' ', '').split(',')
-
+            print "DDD"
             # re-slice and make information from 'key=value'
             for eachInformation in problemInformation:
                 key, value = eachInformation.split('=')
@@ -500,7 +500,7 @@ def post_problem(request, error = None):
                     limitedTime = int(value)
                 elif key == 'LimitedMemory':
                     limitedMemory = int(value)
-               
+            print "??"   
             # Insert new problem
             problemPath = '%s/%s' % (problemsPath,
                                      problemName.replace(' ', ''))
@@ -530,7 +530,7 @@ def post_problem(request, error = None):
                 inOutCases=\
                     [filename for filename in os.listdir(os.getcwd())]
             except OSError:
-                return 'Error has been occurred while listing file names'
+                return LanguageResources().const.ListingFilesError
 
             for filename in inOutCases:
                 rowFileName=filename
@@ -587,10 +587,9 @@ def post_problem(request, error = None):
                                 (problemPath, problemName,\
                                 problemDescriptionPath), shell=True)
             except:
-                return 'problem pdf doesn\'s exist'
+                return LanguageResources().const.NotExistPDF
 
             error = remove_carriage_return(problemPath+'/'+problemName+'_'+solutionCheckType)
-
             if error: return error
             
     

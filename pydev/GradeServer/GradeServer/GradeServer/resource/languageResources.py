@@ -235,3 +235,21 @@ class LanguageResources(object):
     const.Post = ['게시글', 'Post']
     const.DisLike = ['취소', 'DisLike']
     const.Reply = ['댓글', 'Comment']
+
+    '''
+    @@ Master py
+    '''
+    const.SolutionCheckerDirError = ['솔루션이나 체커 폴더가 없습니다', 'There is no \'SOLUTION\' or \'CHECKER\' directory']
+    const.RemoveSpaceError = ['파일 이름에서 공백을 제거하는 도중 에러가 발생했습니다','Error has been occurred while removing space on file names']
+    const.GetCurrentDirError = ['현재 경로를 얻는 도중 에러가 발생했습니다','Error has been occurred while getting current path']
+    const.ChangeDirError = ['경로를 변경하는 도중 에러가 발생했습니다','Error has been occurred while changing directory']
+    const.RenameFileError = ['파일 이름을 변경하는도중 에러가 발생했습니다','Error has been occurred while renaming file']
+    const.MoveShellError = ['.sh 파일을 문제 in/out 파일 경로로 이동할 수 없습니다','Can not move .sh to problem in/out file path']
+    const.RemoveShellError = ['.sh 파일을 지울 수 없습니다', 'Can not remove .sh file']
+    const.UploadingFileError = ['파일 업로딩 에러', 'Uploading file error']
+    const.ListingFilesError = ['파일이름을 읽는 도중에 에러가 발생했습니다', 'Error has been occurred while listing file names']
+    const.ClosingFileError = ['문제 정보 파일을 닫는 도중 에러가 발생했습니다', 'Error has been occurred while closing problem meta file']
+    const.ReadingFileError = ['문제 정보 파일을 읽는 도중 에러가 발생했습니다', 'Error has been occurred while reading problem meta file(.txt)']
+    const.NotExistPDF = ['문제 pdf 파일이 존재하지 않습니다', 'problem pdf doesn\'s exist']
+    const.DeleteFolderError = ['tmp 폴더를 삭제할 수 없습니다','Cannot delete \'tmp\' folder']
+
