@@ -7,7 +7,7 @@
     :author: seulgi choi & uijae lee
     :copyright: (c) 2015 by Algorithmic Engineering Lab at KOOKMIN University
 '''
-import fnmatch
+import fnmatch, shutil
 
 from flask import request, render_template, session
 from sqlalchemy import exc
@@ -437,8 +437,7 @@ def post_problem(request, error = None):
                                           os.listdir(tmpPath)[0])[0].\
                                              replace(' ', '\ ')
             except OSError:
-                return 'Error has been occurred while listing file names'
-            print 'test pring 1'
+                return 'Error has been occurred while listing file names'\
             '''
             @@ Decode problem name
             
@@ -473,7 +472,7 @@ def post_problem(request, error = None):
                     
             except IOError:
                 return 'Error has been occurred while reading problem meta file(.txt)'
-            print 'test print 2'
+
             '''
             @@ Decode problem meta information
             
@@ -573,13 +572,13 @@ def post_problem(request, error = None):
             # create final goal path
             if not os.path.exists(problemPath):
                 os.makedirs(problemPath)
-            print 'test print 5'
+
             problemName = problemName.replace(' ', '')
             problemDescriptionPath = '%s/%s' %(problemDescriptionsPath,
                                                problemName)
             if not os.path.exists(problemDescriptionPath):
                 os.makedirs(problemDescriptionPath)
-            print 'test print 6'
+
             error = rename_file('%s/*'%tmpPath, '%s/'%problemPath)
             if error: return error
 
@@ -589,9 +588,9 @@ def post_problem(request, error = None):
                                 problemDescriptionPath), shell=True)
             except:
                 return 'problem pdf doesn\'s exist'
-            print 'test print 7'
+
             error = remove_carriage_return(problemPath+'/'+problemName+'_'+solutionCheckType)
-            print 'test print 8'        
+
             if error: return error
             
     
@@ -616,11 +615,10 @@ def post_problem(request, error = None):
             # Get ProblemIndex
             for form in request.form:
                 if 'problem' not in form:
-                    update_problem_deleted(problemIndex = int(form))
+                    update_problem_deleted(problemIndex = form)
     
     try:
         dao.commit()
-        print 'test print 9'
         if 'upload' in request.form:
             # update numberOfTestCase
             problem = select_problem(problemIndex = None,
@@ -649,7 +647,8 @@ def post_problem(request, error = None):
                     problemPath = '{0}/Problems/{1}/'.format(projectPath,
                                                              problem.problemName)
                     if os.path.exists(problemPath):
-                        os.removedirs(problemPath)
+                        shutil.rmtree(problemPath)
+
     except exc.SQLAlchemyError:
         dao.rollback()
         error = LanguageResources().const.DBFailed
