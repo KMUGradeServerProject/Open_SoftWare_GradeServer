@@ -26,7 +26,12 @@ class ParameterSetting(object):
                                             FileNameNPathResources.const.FileSeparator)
         
         # make execution file name
-        os.mkdir(self.saveDirectoryName)
+        try:
+            os.mkdir(self.saveDirectoryName)
+        except Exception:
+            sys.stderr.write(ENUMResources.const.SERVER_ERROR + ' ' + str(0) + ' ' + str(0) + ' ' + str(0))
+            sys.exit()
+            
         self.filePath = "%s%s" % (self.filePath,
                                   FileNameNPathResources.const.FileSeparator)
         self.runFileName = self.makeRunFileName()
