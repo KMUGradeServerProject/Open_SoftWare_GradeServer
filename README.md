@@ -1,4 +1,4 @@
-# Open_SoftWare_GradeServer
+# Open_Software_GradeServer
 
 ### GradeServer란?
 프로그래밍 공부를 위해 알고리즘 문제를 제공하는 사이트들을 많이 이용하실 겁니다. 바로 그런 알고리즘 채점 사이트를 간단하게 개설 할 수 있도록 만든 것이 저희의 GradeServer입니다.
