@@ -39,7 +39,7 @@ def Grade(submissionIndex, submissionCount, problemIndex, filePath,
     
     saveDirectoryName = "%i_%i" % (submissionIndex, submissionCount)
     
-    sharingDirName = "tempdir/%s" % (saveDirectoryName)
+    sharingDirName = "/mnt/shared/tempdir/%s" % (saveDirectoryName)
     
     argsList = "%s %s %s %s %i %i %i %s %s %s" % (filePath, problemPath,
                                                   saveDirectoryName, gradeMethod,
