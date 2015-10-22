@@ -27,7 +27,7 @@ class CompileTools(object):
         fileList = glob.glob(self.filePath + FileNameNPathResources.const.AllFile)
         
         if len(fileList) is 0:
-            sys.stderr.write(ENUMResources.const.SERVER_ERROR + ' ' + str(0) + ' ' + str(0) + ' ' + str(0))
+            FileTools.saveResult(ENUMResources.const.SERVER_ERROR, 0, 0, 0)
             sys.exit()
             
         FileTools.copyAllFile(fileList, os.getcwd())
@@ -47,9 +47,9 @@ class CompileTools(object):
             return True
         
         elif os.path.getsize(FileNameNPathResources.const.MessageFile) > 0:
-            sys.stderr.write(ENUMResources.const.COMPILE_ERROR + ' ' + str(0) + ' ' + str(0) + ' ' + str(0))
+            FileTools.saveResult(ENUMResources.const.SERVER_ERROR, 0, 0, 0)
             sys.exit()
         
         else:
-            sys.stderr.write(ENUMResources.const.SERVER_ERROR + ' ' + str(0) + ' ' + str(0) + ' ' + str(0))
+            FileTools.saveResult(ENUMResources.const.SERVER_ERROR, 0, 0, 0)
             sys.exit()
