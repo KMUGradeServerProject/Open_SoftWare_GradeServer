@@ -53,7 +53,13 @@ if osInfo[0] == 'centos':
     print 'start building gradeserver image'
     os.system('docker build -t gradeserver:1.0 .')
     
-    os.makedirs('/mnt/shared')
-    os.makedirs('/mnt/shared/tempdir')
+    try:
+    	os.makedirs('/mnt/shared')
+    except Exception:
+    	pass
+    try:
+    	os.makedirs('/mnt/shared/tempdir')
+    except Exception:
+    	pass
 
 #if osInfo[0] == '':
