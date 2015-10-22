@@ -52,12 +52,19 @@ def Grade(submissionIndex, submissionCount, problemIndex, filePath,
     
     print 'program start'
     
-    os.system(containerCommand + argsList + ' 2>container.txt')
-    UpdateResult(submissionIndex, submissionCount, problemIndex, sharingDirName)
+    try:
+        call(containerCommand + argsList, shell=True)
+        UpdateResult(submissionIndex, submissionCount, problemIndex, sharingDirName)
+    except Exception as e:
+        print e
+        UpdateResult(submissionIndex, submissionCount, problemIndex)
         
 def UpdateResult(submissionIndex, submissionCount,
                  problemIndex, sharingDirName = None):        
     dataUpdate = DBUpdate.DBUpdate(submissionIndex, submissionCount, problemIndex)
+    
+    if sharingDirName is None:
+        dataUpdate.UpdateServerError(submissionIndex, submissionCount, db_session)
    
     dirPath = sharingDirName + "/message.txt"
     try:
@@ -73,8 +80,7 @@ def UpdateResult(submissionIndex, submissionCount,
         dataUpdate.UpdateServerError(submissionIndex, submissionCount, db_session)
         return
         
-    time.sleep(0.3)
-    fp = open('container.txt')
+    fp = open(sharingDirName + '/container.txt')
     messageLine = fp.readlines()[-1]
     messageParaList = messageLine.split()
         
