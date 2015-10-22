@@ -16,11 +16,6 @@ root = sys.argv[0]
 dbUserName = sys.argv[1]
 dbPassword = sys.argv[2]
 
-try:
-    os.makedirs('/mnt/shared')
-except Exception:
-    pass
-
 pid = os.fork()
 
 if pid is not 0:
