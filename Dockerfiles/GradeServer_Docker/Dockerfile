@@ -36,9 +36,5 @@ RUN tar fxz ptrace-1.0.1.tar.gz
 RUN cd ptrace-1.0.1; python setup.py build;python setup.py install
 
 #etc
-RUN mkdir /temp
-RUN mkdir /container
 RUN mkdir /mnt/shared
 ADD gradeprogram.tar.gz /
-
-VOLUME /tempdir
