@@ -54,30 +54,11 @@ def Grade(submissionIndex, submissionCount, problemIndex, filePath,
     
     os.system(containerCommand + argsList + ' 2>container.txt')
     UpdateResult(submissionIndex, submissionCount, problemIndex, sharingDirName)
-    
-"""    message = Popen(containerCommand + argsList, shell=True, stdout=PIPE)
-    
-    for i in xrange(limitTime*100):
-        if message.poll() == None: 
-            time.sleep(0.01)
-        else:
-            messageLines = message.stdout.readlines()
-            UpdateResult(messageLines[-1], submissionIndex, submissionCount,
-                         problemIndex, sharingDirName)
-            break
-    else:
-        UpdateResult('SERVER_ERROR', submissionIndex, submissionCount, problemIndex)
-	Restart(worker_num)
-"""
         
 def UpdateResult(submissionIndex, submissionCount,
                  problemIndex, sharingDirName = None):        
     dataUpdate = DBUpdate.DBUpdate(submissionIndex, submissionCount, problemIndex)
-    
-    fp = open('container.txt')
-    messageLine = fp.readlines()[-1]
-    messageParaList = messageLine.split()
-    
+   
     dirPath = sharingDirName + "/message.txt"
     try:
         if (not os.path.isfile(dirPath)) or os.path.getsize(dirPath) is 0:
@@ -91,6 +72,11 @@ def UpdateResult(submissionIndex, submissionCount,
     except Exception:
         dataUpdate.UpdateServerError(submissionIndex, submissionCount, db_session)
         return
+        
+    time.sleep(0.3)
+    fp = open('container.txt')
+    messageLine = fp.readlines()[-1]
+    messageParaList = messageLine.split()
         
     result = dataUpdate.UpdateResutl(messageParaList, db_session, text)
     
