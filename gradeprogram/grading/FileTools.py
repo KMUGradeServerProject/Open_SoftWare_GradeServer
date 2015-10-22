@@ -20,7 +20,7 @@ class FileTools(object):
             logging.debug(e)
             logging.info('file error : ' + fileName + ' read error')
             
-            sys.stderr.write(ENUMResources.const.SERVER_ERROR + ' ' + str(0) + ' ' + str(0) + ' ' + str(0))
+            saveResult(ENUMResources.const.SERVER_ERROR, 0, 0, 0)
             sys.exit()
         
         lines = readFile.readlines()
@@ -37,7 +37,7 @@ class FileTools(object):
             logging.debug(e)
             logging.info('file error : ' + fileName + ' read error')
             
-            sys.stderr.write(ENUMResources.const.SERVER_ERROR + ' ' + str(0) + ' ' + str(0) + ' ' + str(0))
+            saveResult(ENUMResources.const.SERVER_ERROR, 0, 0, 0)
             sys.exit()
         
         allFile = readFile.read()
@@ -58,7 +58,7 @@ class FileTools(object):
             logging.debug(e)
             logging.info('file error : ' + oldName + ' copy error')
             
-            sys.stderr.write(ENUMResources.const.SERVER_ERROR + ' ' + str(0) + ' ' + str(0) + ' ' + str(0))
+            saveResult(ENUMResources.const.SERVER_ERROR, 0, 0, 0)
             sys.exit()
     
     # 리스트의 모든 파일을 지정한 경로로 복사    
@@ -71,5 +71,15 @@ class FileTools(object):
             logging.debug(e)
             logging.info('file error : All file copy error')
             
-            sys.stderr.write(ENUMResources.const.SERVER_ERROR + ' ' + str(0) + ' ' + str(0) + ' ' + str(0))
+            saveResult(ENUMResources.const.SERVER_ERROR, 0, 0, 0)
             sys.exit()
+
+    # 결과 저장
+    @staticmethod
+    def saveResult(result, score, time, memory):
+        try:
+            fp = open('container.txt', 'w')
+            fp.write(result + ' ' + str(score) + ' ' + str(time) + ' ' + str(memory))
+            fp.close()
+        except Exception:
+            saveResult(ENUMResources.const.SERVER_ERROR, 0, 0, 0)
