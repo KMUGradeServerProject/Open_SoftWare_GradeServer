@@ -47,7 +47,7 @@ class CompileTools(object):
             return True
         
         elif os.path.getsize(FileNameNPathResources.const.MessageFile) > 0:
-            FileTools.saveResult(ENUMResources.const.SERVER_ERROR, 0, 0, 0)
+            FileTools.saveResult(ENUMResources.const.COMPILE_ERROR, 0, 0, 0)
             sys.exit()
         
         else:
