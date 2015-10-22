@@ -3,6 +3,7 @@ import os
 import glob
 import string
 import logging
+from FileTools import FileTools
 from gradingResource.listResources import ListResources
 from gradingResource.fileNameNPathResources import FileNameNPathResources
 
@@ -29,7 +30,7 @@ class ParameterSetting(object):
         try:
             os.mkdir(self.saveDirectoryName)
         except Exception:
-            sys.stderr.write(ENUMResources.const.SERVER_ERROR + ' ' + str(0) + ' ' + str(0) + ' ' + str(0))
+            FileTools.saveResult(ENUMResources.const.SERVER_ERROR, 0, 0, 0)
             sys.exit()
             
         self.filePath = "%s%s" % (self.filePath,
