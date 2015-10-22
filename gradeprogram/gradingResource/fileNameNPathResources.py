@@ -3,7 +3,7 @@ class FileNameNPathResources(object):
     
     import const
     
-    const.TempDirectory = 'tempdir'
+    const.TempDirectory = '/mnt/shared/tempdir'
     const.ProcessDirName = '/proc/'
     const.ProcessStatusFileName = '/status'
     const.FileSeparator = '/'
