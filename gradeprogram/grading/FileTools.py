@@ -81,5 +81,6 @@ class FileTools(object):
             fp = open('container.txt', 'w')
             fp.write(result + ' ' + str(score) + ' ' + str(time) + ' ' + str(memory))
             fp.close()
+            sys.exit()
         except Exception:
             saveResult(ENUMResources.const.SERVER_ERROR, 0, 0, 0)
