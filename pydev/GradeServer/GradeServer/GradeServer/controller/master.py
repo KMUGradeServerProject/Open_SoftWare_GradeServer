@@ -438,7 +438,7 @@ def post_problem(request, error = None):
                                              replace(' ', '\ ')
             except OSError:
                 return 'Error has been occurred while listing file names'
-            
+            print 'test pring 1'
             '''
             @@ Decode problem name
             
@@ -473,7 +473,7 @@ def post_problem(request, error = None):
                     
             except IOError:
                 return 'Error has been occurred while reading problem meta file(.txt)'
-            
+            print 'test print 2'
             '''
             @@ Decode problem meta information
             
@@ -501,13 +501,13 @@ def post_problem(request, error = None):
                     limitedTime = int(value)
                 elif key == 'LimitedMemory':
                     limitedMemory = int(value)
-            
-                    
+               
             # Insert new problem
             problemPath = '%s/%s' % (problemsPath,
                                      problemName.replace(' ', ''))
             if not select_problem(problemIndex = None,
-                                  problemName = problemName).first():
+                                  problemName = problemName,
+                                  isDeleted = ENUMResources().const.TRUE).first():
                 dao.add(insert_problem(problemName,
                                        problemDifficulty,
                                        solutionCheckType,
@@ -517,13 +517,13 @@ def post_problem(request, error = None):
             else:
                 # Duplication Case
                 update_problem_deleted(select_problem(problemIndex = None,
-                                                      problemName = problemName).first().\
+                                                      problemName = problemName,
+                                                      isDeleted = ENUMResources().const.TRUE).first().\
                                                                                  problemIndex,
                                        isDeleted = ENUMResources().const.FALSE)
            
             newProblemPath='%s/%s_%s' %\
                            (tmpPath, problemName, solutionCheckType)
-            
             if change_directory_to(newProblemPath): return
                                 
             try:
@@ -573,13 +573,13 @@ def post_problem(request, error = None):
             # create final goal path
             if not os.path.exists(problemPath):
                 os.makedirs(problemPath)
-            
+            print 'test print 5'
             problemName = problemName.replace(' ', '')
             problemDescriptionPath = '%s/%s' %(problemDescriptionsPath,
                                                problemName)
             if not os.path.exists(problemDescriptionPath):
                 os.makedirs(problemDescriptionPath)
-            
+            print 'test print 6'
             error = rename_file('%s/*'%tmpPath, '%s/'%problemPath)
             if error: return error
 
@@ -589,9 +589,9 @@ def post_problem(request, error = None):
                                 problemDescriptionPath), shell=True)
             except:
                 return 'problem pdf doesn\'s exist'
-            
+            print 'test print 7'
             error = remove_carriage_return(problemPath+'/'+problemName+'_'+solutionCheckType)
-                    
+            print 'test print 8'        
             if error: return error
             
     
@@ -620,6 +620,7 @@ def post_problem(request, error = None):
     
     try:
         dao.commit()
+        print 'test print 9'
         if 'upload' in request.form:
             # update numberOfTestCase
             problem = select_problem(problemIndex = None,
