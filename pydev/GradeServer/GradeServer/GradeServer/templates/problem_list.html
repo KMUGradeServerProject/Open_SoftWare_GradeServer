@@ -102,14 +102,8 @@
     								<h3>오답 메시지</h3>
   								</div>
   								<div class="modal-body modal-scroll">			
-    									<p>힌트 사용시 힌트 횟수가 1회 차감됩니다.</p>
-	    								{%- if chanceCount != 0 and isChance == 'TRUE' %}
-	    									<button class="btn btn-danger firstModalClose" data-toggle="modal" href="#HintMessage{{problemListRecord.problemName}}">
-												{{ LanguageResources.const.HintView[session['language']] }}( {{chanceCount}} 
-												{{ LanguageResources.const.HintCount[session['language']] }})</button>
-	    								{%- else %}
-	    									<font color="#ff0000">{{ LanguageResources.const.EmptyHint[session['language']] }}</>
-	    								{%- endif %}
+	    								<button class="btn btn-danger firstModalClose" data-toggle="modal" href="#HintMessage{{problemListRecord.problemName}}">
+											{{ LanguageResources.const.HintView[session['language']] }}</button>
   								</div>
   								<div class="modal-footer">
     								<button type="button" data-dismiss="modal" class="btn btn-primary">{{ LanguageResources.const.Close[session['language']] }}</button>
