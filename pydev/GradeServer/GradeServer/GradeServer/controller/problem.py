@@ -43,6 +43,7 @@ from GradeServer.utils.utilProblemQuery import join_problems_name,\
                                                join_problem_lists_submissions,\
                                                select_problem,\
                                                select_all_problems
+from GradeServer.utils.utilUserQuery import join_member_id
 from GradeServer.utils.utilCodeSubmissionQuery import select_all_languages                                               
 from GradeServer.utils.utils import is_authority,\
                                     get_request_value
