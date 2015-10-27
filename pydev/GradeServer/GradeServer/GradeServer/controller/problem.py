@@ -111,8 +111,16 @@ def problem_list(pageNum):
 
         # Get Course Information
         
-        browserName = request.user_agent.browser
-        browserVersion = request.user_agent.version
+        browserInformations = request.user_agent.string
+        if browserInformations.find('Trident') == -1:
+            if browserInformations.find('MSIE') == -1:
+                browserVersion = ENUMResources().const.TRUE
+            else:
+                browserVersion = ENUMResources().const.FALSE        
+        elif int(browserInformations[browserInformations.find('Trident') + 8]) < 6:
+            browserVersion = ENUMResources().const.FALSE
+        else:
+            browserVersion = ENUMResources().const.TRUE
         wrongTestCaseText = {}
         for problemListRecord in problemListRecords:
             if problemListRecord.wrongTestCaseNumber != 0:
@@ -130,7 +138,6 @@ def problem_list(pageNum):
         return render_template(HTMLResources().const.PROBLEM_LIST_HTML,
                                problemListRecords = problemListRecords,
                                wrongTestCaseText = wrongTestCaseText,
-                               browserName = browserName,
                                browserVersion = browserVersion,
                                datetime = datetime.now(),
                                pages = get_page_pointed(pageNum = pageNum,
