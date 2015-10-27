@@ -39,6 +39,9 @@ if osInfo[0] == 'centos':
 
     os.system('service docker start')
     os.system('chkconfig docker on')
+    os.system('sudo cp -r pydev /mnt/shared')
+    os.system('sudo cp -r gradeProgram /mnt/shared')
+    os.system('sudo cp -r Dockerfiles /mnt/shared')
 
     dockerDir = root.replace('make.py', '')
     
@@ -48,7 +51,7 @@ if osInfo[0] == 'centos':
     os.chdir(dockerDir)
 
     os.system('tar cvfz ./Dockerfiles/GradeServer_Docker/gradeprogram.tar.gz gradeprogram/')
-    os.chdir('Dockerfiles/GradeServer_Docker')
+    os.chdir('/mnt/shared/Dockerfiles/GradeServer_Docker')
 
     print 'start building gradeserver image'
     os.system('docker build -t gradeserver:1.0 .')
