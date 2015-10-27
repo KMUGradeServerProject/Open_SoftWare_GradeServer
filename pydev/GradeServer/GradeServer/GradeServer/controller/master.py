@@ -287,7 +287,7 @@ def manage_user(filterCondition, keyWord, sortCondition, pageNum, error = None):
                                                                         member.memberName)
                                 # Delete Folder
                                 if os.path.exists(userPath):
-                                    os.removedirs(userPath)
+                                    shutil.rmtree(userPath)
                             except Exception:
                                 dao.rollback()
                                 error = LanguageResources().const.DBFailed
