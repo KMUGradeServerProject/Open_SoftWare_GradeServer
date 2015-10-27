@@ -7,7 +7,7 @@
 {%- extends "main.html" -%}
 {%- block body %}
 <div class="container">
-{%- if browserName == 'msie' and browserVersion|length != 4 %}
+{%- if browserVersion == 'FALSE' %}
 	<h2>현재 접속하신 브라우저에서는 문제 제출이 불가합니다.</h2> 
 	<h2>다른 브라우저를 사용하시거나 익스플로러를 업데이트 해주시기 바랍니다.</h2>
 	<h4>익스플로러 업데이트 : <a href="http://windows.microsoft.com/ko-kr/internet-explorer/download-ie">http://windows.microsoft.com/ko-kr/internet-explorer/download-ie</a></h4>
