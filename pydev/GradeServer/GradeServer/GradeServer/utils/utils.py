@@ -144,9 +144,12 @@ def course_problem_check(isAdministrator, authority, memberIdIndex, problemIndex
                          thisMemberIdIndex, isCode):
     
     # Problem in Course Check
-    if problemIndex\
-       and (not select_problem(problemIndex).first()\
-            or isCode):
-        return False
+    if problemIndex:
+        if not select_problem(problemIndex).first():
+            return False
+        if isCode\
+           and authority[1]\
+           and thisMemberIdIndex != memberIdIndex:
+            return False
         
     return True
