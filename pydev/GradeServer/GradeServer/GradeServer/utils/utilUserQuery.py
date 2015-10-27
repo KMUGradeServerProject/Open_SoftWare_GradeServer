@@ -21,9 +21,10 @@ def select_all_members():
 '''
 Select match MemberId  
 '''
-def select_match_member_id(memberId):
+def select_match_member_id(memberId, isDeleted = ENUMResources().const.FALSE):
     return dao.query(Members).\
-               filter(Members.memberId == memberId)
+               filter(Members.memberId == memberId,
+                      isDeleted == isDeleted)
               
                
 
@@ -31,18 +32,21 @@ def select_match_member_id(memberId):
 '''
 Search Members
 '''
-def search_members(members, filterFindParameter):
+def search_members(members, filterFindParameter, isDeleted = ENUMResources().const.FALSE):
     # condition은 All, ID, Name로 나누어서 검새
     if filterFindParameter.filterCondition == LanguageResources().const.All[1]: # Filters[0] is '모두'
         members = dao.query(members).\
                       filter(or_(members.c.memberId == filterFindParameter.keyWord, 
-                                 members.c.memberName.like('%' + filterFindParameter.keyWord + '%')))
+                                 members.c.memberName.like('%' + filterFindParameter.keyWord + '%')),
+                             isDeleted == isDeleted)
     elif filterFindParameter.filterCondition == LanguageResources().const.ID[1]: # Filters[1] is ID
         members = dao.query(members).\
-                      filter(members.c.memberId == filterFindParameter.keyWord)
+                      filter(members.c.memberId == filterFindParameter.keyWord,
+                             isDeleted == isDeleted)
     else: # Filters[2] is 'NAme'
         members = dao.query(members).\
-                      filter(members.c.memberName.like('%'+ filterFindParameter.keyWord + '%'))
+                      filter(members.c.memberName.like('%'+ filterFindParameter.keyWord + '%'),
+                             isDeleted == isDeleted)
 
     return members
 
@@ -52,9 +56,10 @@ def search_members(members, filterFindParameter):
 '''
 Select Member
 '''
-def select_member(memberIdIndex):
+def select_member(memberIdIndex, isDeleted = ENUMResources().const.FALSE):
     return dao.query(Members).\
-               filter(Members.memberIdIndex == memberIdIndex)
+               filter(Members.memberIdIndex == memberIdIndex,
+                      isDeleted == isDeleted)
                
                
                
