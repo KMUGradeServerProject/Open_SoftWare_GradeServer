@@ -14,8 +14,9 @@ from GradeServer.resource.languageResources import LanguageResources
 
 
 
-def select_all_members():
-    return dao.query(Members)
+def select_all_members(isDeleted = ENUMResources().const.FALSE):
+    return dao.query(Members).\
+               filter(Members.isDeleted == isDeleted)
 
 
 '''
@@ -24,7 +25,7 @@ Select match MemberId
 def select_match_member_id(memberId, isDeleted = ENUMResources().const.FALSE):
     return dao.query(Members).\
                filter(Members.memberId == memberId,
-                      isDeleted == isDeleted)
+                      Members.isDeleted == isDeleted)
               
                
 
@@ -38,15 +39,15 @@ def search_members(members, filterFindParameter, isDeleted = ENUMResources().con
         members = dao.query(members).\
                       filter(or_(members.c.memberId == filterFindParameter.keyWord, 
                                  members.c.memberName.like('%' + filterFindParameter.keyWord + '%')),
-                             isDeleted == isDeleted)
+                             members.c.isDeleted == isDeleted)
     elif filterFindParameter.filterCondition == LanguageResources().const.ID[1]: # Filters[1] is ID
         members = dao.query(members).\
                       filter(members.c.memberId == filterFindParameter.keyWord,
-                             isDeleted == isDeleted)
+                             members.c.isDeleted == isDeleted)
     else: # Filters[2] is 'NAme'
         members = dao.query(members).\
                       filter(members.c.memberName.like('%'+ filterFindParameter.keyWord + '%'),
-                             isDeleted == isDeleted)
+                             members.c.isDeleted == isDeleted)
 
     return members
 
@@ -59,7 +60,7 @@ Select Member
 def select_member(memberIdIndex, isDeleted = ENUMResources().const.FALSE):
     return dao.query(Members).\
                filter(Members.memberIdIndex == memberIdIndex,
-                      isDeleted == isDeleted)
+                      Members.isDeleted == isDeleted)
                
                
                
