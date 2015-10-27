@@ -120,6 +120,7 @@
     								<h3>Hint Message</h3>
   								</div>
   								<div class="modal-body modal-scroll">
+  									<h4>아래의 input case에 대해 오답이 발생하였습니다.</h4> <br>
     								{% for case in get_split_list(wrongTestCaseText[problemListRecord.problemName], '\n') %}
     									{{ case }} <br> 
     								{% endfor %}
