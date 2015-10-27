@@ -21,16 +21,13 @@ pid = os.fork()
 if pid is not 0:
     time.sleep(2.2)
     
-    dockerDir = root.replace('runserver.py', 'Dockerfiles/GradeServer_Docker')
-    os.system('sudo python ' + dockerDir + '/create_container.py')
+    os.system('sudo python /mnt/shared/Dockerfiles/create_container.py')
     
-    serverDir = root.replace('runserver.py', 'pydev/GradeServer/GradeServer')
-    os.chdir(serverDir)
+    os.chdir('/mnt/shared/pydev/GradeServer/GradeServer')
     os.execl('/usr/bin/sudo', '/usr/bin/sudo', 'python', 'runserver.py', dbUserName, dbPassword)
 
 else:
-    celeryDir = root.replace('runserver.py', 'celeryServer')
-    os.chdir(celeryDir)
+    os.chdir('celeryServer/')
     
     fp = open('data.txt', 'w')
     fp.write(dbUserName + '\n')
