@@ -21,7 +21,7 @@ pid = os.fork()
 if pid is not 0:
     time.sleep(2.2)
     
-    os.system('sudo python /mnt/shared/Dockerfiles/create_container.py')
+    os.system('sudo python /mnt/shared/Dockerfiles/GradeServer_Docker/create_container.py')
     
     os.chdir('/mnt/shared/pydev/GradeServer/GradeServer')
     os.execl('/usr/bin/sudo', '/usr/bin/sudo', 'python', 'runserver.py', dbUserName, dbPassword)
