@@ -409,9 +409,9 @@ Replies on Code
 '''
 def select_replies_on_code(submissionIndex, submissionReplyIndex = None, isDeleted = ENUMResources().const.FALSE):
     return dao.query(RepliesOnSubmission).\
-               filter(and_((RepliesOnSubmission.submissionIndex == submissionIndex if submissionIndex
-                            else RepliesOnSubmission.submissionReplyIndex == submissionReplyIndex),
-                           RepliesOnSubmission.isDeleted == isDeleted)) 
+               filter((RepliesOnSubmission.submissionIndex == submissionIndex if submissionIndex
+                       else RepliesOnSubmission.submissionReplyIndex == submissionReplyIndex),
+                      RepliesOnSubmission.isDeleted == isDeleted) 
  
  
 ''' 

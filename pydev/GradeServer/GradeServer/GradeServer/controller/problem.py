@@ -345,8 +345,7 @@ def submission_code(memberIdIndex, status, problemIndex, error = None):
                             except Exception:
                                 writerIndex = None
                             if (authorityCheck[0] or authorityCheck[1])\
-                               or(writerIndex.codeReplierOrganizationIndex == session['organizationIndex']\
-                                  and writerIndex.codeReplierIdIndex == session['memberIdIndex']):
+                               or writerIndex.codeReplierIdIndex == session['memberIdIndex']:
                                     
                                 update_replies_on_code_delete(submissionReplyIndex,
                                                               isDeleted = ENUMResources().const.TRUE)
@@ -367,8 +366,7 @@ def submission_code(memberIdIndex, status, problemIndex, error = None):
                                                                      submissionReplyIndex = submissionReplyIndex).first()
                             except Exception:
                                 writerIndex = None
-                            if writerIndex.codeReplierOrganizationIndex == session['organizationIndex']\
-                               and writerIndex.codeReplierIdIndex == session['memberIdIndex']:
+                            if writerIndex.codeReplierIdIndex == session['memberIdIndex']:
                                 submissionReplyContent = get_request_value(form = request.form,
                                                                            name = 'modifyCodeReplyContent{0}'.format(form[replyIndex:]))
                                 
@@ -397,6 +395,8 @@ def submission_code(memberIdIndex, status, problemIndex, error = None):
                 try:
                     # replies 정보
                     repliesOnSubmissionRecords = select_replies_on_code(submissionIndex).subquery()
+                    repliesOnSubmissionRecords = join_member_id(repliesOnSubmissionRecords,
+                                                                repliesOnSubmissionRecords.c.codeReplierIdIndex)
                                         # 내가 게시글 리플에 누른 좋아요 정보
                     repliesOnSubmissionIsLikeRecords = select_replies_on_code_like(repliesOnSubmissionRecords.subquery(),
                                                                                    session[SessionResources().const.MEMBER_ID_INDEX]).all()
