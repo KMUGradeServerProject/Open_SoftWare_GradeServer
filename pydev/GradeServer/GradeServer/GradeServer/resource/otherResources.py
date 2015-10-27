@@ -20,7 +20,7 @@ class OtherResources(object):
     const.REPLY_ROW = 50
 
     # file
-    const.PDF_PATH = './GradeServer/static/ProblemDescriptions/%s/%s.pdf'
+    const.PDF_PATH = '/mnt/shared/pydev/GradeServer/GradeServer/GradeServer/static/ProblemDescriptions/%s/%s.pdf'
     const.FILE_PATH = '%s/%s_%s/%s'
     const.TEMP_PATH = '%s/%s_%s/%s_tmp'
     const.GET_FILES = 'file[]'
