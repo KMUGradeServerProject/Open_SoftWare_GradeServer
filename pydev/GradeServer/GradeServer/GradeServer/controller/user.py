@@ -116,7 +116,7 @@ def submission_record(memberIdIndex, sortCondition, pageNum):
 def id_check(select, error = None):
     if request.method == 'POST':
         password = get_request_value(form = request.form,
-                                    name = 'password')
+                                     name = 'password')
         if password:
             check = select_member(memberIdIndex = session[SessionResources().const.MEMBER_ID_INDEX]).first()
                                         

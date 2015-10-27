@@ -91,8 +91,9 @@ def check_user_info(request_form, error = None):
                 error = LanguageResources().const.WrongPassword
         # Not Exist MemberId
         except Exception:
-            # Return Login Page
-            return error
+            error = LanguageResources().const.WrongPassword
+        # Return Login Page
+        return error
         
 """
 메인 페이지 및 로그인 관리 
