@@ -477,6 +477,8 @@ def post_problem(request, error = None):
                 problemInformation = problemInformation.decode('cp949')
             # slice and make key, value pairs from csv form
             problemInformation = problemInformation.replace(' ', '').split(',')
+            if len(problemInformation) != 5:
+                return LanguageResources().const.NotEnoughInfoError
             # re-slice and make information from 'key=value'
             for eachInformation in problemInformation:
                 key, value = eachInformation.split('=')
