@@ -485,7 +485,10 @@ def post_problem(request, error = None):
                     # Don't use 'value' for problem name
                     problemName = problemName.replace('\ ', ' ')
                 elif key == 'Difficulty':
-                    problemDifficulty = int(value)
+                    if isinstance(value, int):
+                        problemDifficulty = int(value)
+                    else:
+                        return LanguageResources().const.DifficultyCharError
                 elif key == 'SolutionCheckType':
                     solutionCheckType = ENUMResources().const.SOLUTION if value == 'Solution'\
                                         else ENUMResources().const.CHECKER

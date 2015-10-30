@@ -252,4 +252,4 @@ class LanguageResources(object):
     const.ReadingFileError = ['문제 정보 파일을 읽는 도중 에러가 발생했습니다', 'Error has been occurred while reading problem meta file(.txt)']
     const.NotExistPDF = ['문제 pdf 파일이 존재하지 않습니다', 'problem pdf doesn\'s exist']
     const.DeleteFolderError = ['tmp 폴더를 삭제할 수 없습니다','Cannot delete \'tmp\' folder']
-
+    const.DifficultyCharError = ['난이도는 숫자여야 합니다','Difficulty must be a number']
