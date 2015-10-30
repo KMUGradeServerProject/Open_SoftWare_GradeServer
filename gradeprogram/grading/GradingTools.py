@@ -124,7 +124,7 @@ class GradingTools(object):
                         appendFlag = False
                     
                 i += 1
-                if i is loopCount:
+                if i >= loopCount:
                     break
                 
             if caseCount is self.caseCount:
