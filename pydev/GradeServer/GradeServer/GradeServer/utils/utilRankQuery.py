@@ -133,7 +133,7 @@ def rankTieProcess(ranks):
     # High solvedRate
     solvedRate = dao.query(func.max(ranks.c.solvedRate).label('solvedRate')).subquery()
     ranks = dao.query(ranks).\
-                filter(ranks.c.solvedRate == solvedRate.c.solvedRate).subquery()   
+                filter(func.round(ranks.c.solvedRate, 4) == func.round(solvedRate.c.solvedRate, 4)).subquery()   
                      
     # High sumOfSolvedProblemCount
     solvedRate = dao.query(func.max(ranks.c.sumOfSolvedProblemCount).label('sumOfSolvedProblemCount')).subquery()
