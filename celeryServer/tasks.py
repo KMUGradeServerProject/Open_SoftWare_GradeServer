@@ -58,6 +58,7 @@ def Grade(submissionIndex, submissionCount, problemIndex, filePath,
     except Exception as e:
         print e
         UpdateResult(submissionIndex, submissionCount, problemIndex)
+        Restart(worker_num)
         
 def UpdateResult(submissionIndex, submissionCount,
                  problemIndex, sharingDirName = None):        
